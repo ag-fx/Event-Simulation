@@ -2,10 +2,9 @@ package com.myApp.controller
 
 import com.myApp.model.MyModel
 import javafx.beans.property.SimpleStringProperty
-import kotlinx.coroutines.experimental.channels.consumeEach
-import kotlinx.coroutines.experimental.channels.filter
-import coroutines.JavaFx as onUi
+import kotlinx.coroutines.experimental.channels.*
 import kotlinx.coroutines.experimental.launch
+import coroutines.JavaFx as onUi
 import tornadofx.*
 
 class MyController : Controller() {
