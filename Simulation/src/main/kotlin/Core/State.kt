@@ -1,6 +1,6 @@
 package Core
 
 interface State {
-   val running : Boolean
-   val executedEvents: List<Event>
+    val running: Boolean
+    val events:  MutableCollection<Event>
 }

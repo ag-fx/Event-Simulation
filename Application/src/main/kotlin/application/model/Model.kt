@@ -1,4 +1,4 @@
-package com.myApp.model
+package application.model
 
 import kotlinx.coroutines.experimental.channels.produce
 
@@ -11,3 +11,4 @@ class MyModel {
     }
 
 }
+

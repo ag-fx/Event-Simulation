@@ -1,6 +1,6 @@
-package com.myApp.view
+package application.view
 
-import com.myApp.controller.MyController
+import application.controller.MyController
 import tornadofx.*
 
 class MainView : View("Hello TornadoFX") {
@@ -11,5 +11,8 @@ class MainView : View("Hello TornadoFX") {
         label(myController.textProperty)
         myController.run()
         textfield { text = "live ui :)" }
+        button("Speed up") { action { myController.speedUp() } }
+        button("Pause") { action { myController.pause() } }
+        button("Resume") { action { myController.resume() } }
     }
 }

@@ -1,5 +1,7 @@
-include 'Random'
-findProject(':Random')?.name = 'random'
-include 'Simulation'
-include 'Application'
-
+rootProject.name = 'discreteSim'
+include 'Random','Simulation','Application'
+//include 'Random'
+//findProject(':Random')?.name = 'random'
+//include 'Simulation'
+//include 'Application'
+//

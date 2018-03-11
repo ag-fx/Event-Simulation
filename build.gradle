@@ -8,32 +8,62 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
+
 }
 
-apply plugin: "kotlin"
+allprojects {
+    group 'discreteSim'
+    version '0.1'
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url 'https://jitpack.io' }
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url 'https://jitpack.io' }
+    }
+
 }
 
-dependencies {
-    testCompile 'junit:junit:4.12'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+
+subprojects {
+    apply plugin: "kotlin"
+
+    task initSourceFolders {
+        sourceSets*.kotlin.srcDirs*.each { it.mkdirs() }
+        sourceSets*.resources.srcDirs*.each { it.mkdirs() }
+    }
+    compileKotlin {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+
+
+    kotlin {
+        experimental {
+            coroutines 'enable'
+        }
+    }
+
+    dependencies {
+        testCompile 'junit:junit:4.12'
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+        compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.21"
+
 
 //    RxJava
 //    compile 'com.github.thomasnield:rxkotlinfx:2.2.2'
 //    compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
 //    compile "com.github.akarnokd:rxjava2-extensions:0.18.7"
 
-}
+    }
 
 
 
 
 
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+
 }

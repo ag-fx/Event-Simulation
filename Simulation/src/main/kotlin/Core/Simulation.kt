@@ -1,21 +1,69 @@
 package Core
 
+import TestSim.Tick
 import kotlinx.coroutines.experimental.channels.produce
+import kotlinx.coroutines.experimental.sync.Mutex
 import org.jetbrains.annotations.TestOnly
 import java.util.*
+import java.util.concurrent.PriorityBlockingQueue
 
-abstract class Simulation<out S : State>(private val maxSimTime: Double) {
+abstract class Simulation<out S : State>(
+        private val maxSimTime: Double = 30 * 24.0
+) {
 
+    private val timeLine = PriorityBlockingQueue<Event>()
+    private val allEvents = Collections.synchronizedCollection(LinkedList<Event>())
+    private val oneSecond = 1.0//1 / (60 * 60) // 1 seconds in one hour
 
-    private val timeline = PriorityQueue<Event>()
+    var sleepTime = 0L
+    var currentTime = 0.0
+        private set(value) {
+            field = value
+        }
 
-    private val executedEvents = mutableListOf<Event>()
+    var speed = oneSecond * 60
+
+    private var isRunning = true
 
     protected val rndSeed = Random()
 
-    protected var simTime = 0.0
+    fun start() = produce {
+        while (currentTime < maxSimTime && timeLine.isNotEmpty()) {
+            if (isSimulationRunning()) {
+                val currentEvent = timeLine.poll()
+                currentTime = currentEvent.occurrenceTime
+                currentEvent.execute(this@Simulation)
+                println(currentEvent)
+                allEvents.add(currentEvent)
+                val state = toState(currentTime, allEvents)
+                send(state)
+//                plan(Tick(currentTime+speed))
+            }
+        }
+        isRunning = false
+        send(toState(currentTime, allEvents))
+        close()
 
-    protected var isRunning = true
+        print ("Simulation stopped ")
+        when {
+            currentTime > maxSimTime -> println("cause we ran out of time")
+            timeLine.isEmpty() -> println("cause time line is empty")
+        }
+
+
+    }
+
+    fun plan(event: Event) {
+        if (event.occurrenceTime >= currentTime)
+            timeLine.add(event)
+        else
+            throw IllegalStateException("Time travel exception")
+    }
+
+    @TestOnly
+    fun poll() = timeLine.poll()
+
+    protected abstract fun toState(simTime: Double, lastEvent: MutableCollection<Event>): S
 
     fun pause() {
         isRunning = false
@@ -25,26 +73,5 @@ abstract class Simulation<out S : State>(private val maxSimTime: Double) {
         isRunning = true
     }
 
-    fun isSimualtionRunning() = isRunning
-
-    fun start() = produce {
-        while (simTime < maxSimTime && timeline.isNotEmpty()) {
-            if (isSimualtionRunning()) {
-                val currentEvent = timeline.poll()
-                simTime += currentEvent.occurrenceTime
-                currentEvent.execute()
-                executedEvents.add(currentEvent)
-                send(toState(simTime, executedEvents))
-            }
-        }
-        close()
-        println("Simulation stopped")
-    }
-
-    fun plan(event: Event) = timeline.add(event)
-
-    @TestOnly
-    fun poll() = timeline.poll()
-
-    protected abstract fun toState(simTime: Double, executedEvents: List<Event>): S
+    private fun isSimulationRunning() = isRunning
 }

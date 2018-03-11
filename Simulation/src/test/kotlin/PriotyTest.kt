@@ -3,13 +3,14 @@ import io.kotlintest.matchers.shouldEqual
 import io.kotlintest.specs.StringSpec
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.channels.consumeEach
+import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import test.*
 
 class MyTests : StringSpec() {
-    init {
+        init {
         val testSim = TestSimulation()
-        val events = listOf(TestEventFour(), TestEventOne(), TestEventTwo(), TestEventThree())
+        val events = listOf(TestEventOne())
         events.forEach { testSim.plan(it) }
 
         with(testSim) {
@@ -23,9 +24,11 @@ class MyTests : StringSpec() {
                 runBlocking {
                     var events = ArrayList<Event>()
                     start().consumeEach {
-                        events = it.executedEvents as ArrayList<Event>
+                    //  //  events = it.executedEvents as ArrayList<Event>
+                    //    println(it)
                     }
                     events shouldEqual events.sortedBy { it.occurrenceTime }
+                    // println(events)
                 }
 
             }
