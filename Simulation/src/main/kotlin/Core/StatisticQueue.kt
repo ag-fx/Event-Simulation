@@ -8,16 +8,16 @@ interface Statistical {
 
 class StatisticQueue<T : Statistical, out S : State>(private val simCore: Simulation<S>) {
 
-    private val queue: Queue<T> = LinkedList<T>()
-    private var lastChange = 0.0
-    private var totalTime = 0.0
-    private var weightTime = 0.0
-    private var totalWaitTime = 0.0
-    private var served = 0.0
+    private val queue           = LinkedList<T>() as Queue<T>
+    private var lastChange      = 0.0
+    private var totalTime       = 0.0
+    private var weightTime      = 0.0
+    private var totalWaitTime   = 0.0
+    private var served          = 0.0
 
     private fun beforeChange() {
         weightTime += (simCore.currentTime - lastChange) * queue.size
-        totalTime += (simCore.currentTime - lastChange)
+        totalTime  += (simCore.currentTime - lastChange)
     }
 
     fun push(t: T) {
@@ -28,7 +28,7 @@ class StatisticQueue<T : Statistical, out S : State>(private val simCore: Simula
 
     fun pop(): T {
         beforeChange()
-        val popped = queue.poll()
+        val popped = queue.remove()
         lastChange = simCore.currentTime
         totalWaitTime += simCore.currentTime - popped.arrivedToSystem
         served++
@@ -42,4 +42,5 @@ class StatisticQueue<T : Statistical, out S : State>(private val simCore: Simula
     fun isEmpty() = queue.isEmpty()
 
     fun isNotEmpty() = queue.isNotEmpty()
+
 }

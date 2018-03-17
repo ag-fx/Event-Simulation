@@ -1,15 +1,17 @@
 package test
 
-import Core.Event
-import Core.Simulation
-import Core.State
+import TestSim.Newsstand.NewsstandSimulation
+import kotlinx.coroutines.experimental.channels.consumeEach
+import kotlinx.coroutines.experimental.runBlocking
 
-data class TestState(val time: Double, override val running: Boolean,  override val events: MutableCollection<Event>) : State
-//
-//class TestSimulation : Simulation<TestState>(maxSimTime = 10_000.0) {
-//    override fun toState(simTime: Double, events: MutableCollection<Event>) = TestState(
-//            time = simTime,
-//            running = true,
-//            events = events)
-//
-//}
+
+fun main(args: Array<String>) = runBlocking {
+
+    val sim = NewsstandSimulation()
+
+    sim.start().consumeEach {
+        println("${it.avgWaitTime}\t${it.avgQueueSize}" )
+    }
+
+}
+

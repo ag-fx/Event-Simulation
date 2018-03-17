@@ -9,11 +9,12 @@ abstract class Simulation<out S : State>(
         private val maxSimTime: Double = 30 * 24.0 * 60
 ) {
 
-    private val timeLine  = PriorityBlockingQueue<Event>()
-    private val allEvents = Collections.synchronizedCollection(LinkedList<Event>())
+    private val timeLine = PriorityBlockingQueue<Event>()
     private val oneSecond = 1.0
+    private var runs = 0
 
     var sleepTime = 0L
+
     var currentTime = 0.0
         private set(value) {
             field = value
@@ -26,24 +27,28 @@ abstract class Simulation<out S : State>(
     protected val rndSeed = Random()
 
     fun start() = produce {
-        beforeReplication()
-        while (shouldSimulate()) {
-            if (isSimulationRunning()) {
-                val currentEvent = timeLine.poll()
-                currentTime = currentEvent.occurrenceTime
-                currentEvent.execute(this@Simulation)
-                //println(currentEvent)
-                allEvents.add(currentEvent)
-                val state = toState(currentTime, allEvents)
-                send(state)
-            }
-        }
+        repeat(5) {
+            beforeReplication()
 
-        isRunning = false
-        send(toState(currentTime, allEvents))
+            while (shouldSimulate()) {
+                if (isSimulationRunning()) {
+                    val currentEvent = timeLine.poll()
+                    currentTime = currentEvent.occurrenceTime
+                    currentEvent.execute(this@Simulation)
+                    //println(currentEvent)
+                    val state = toState(runs++, currentTime)
+                    send(state)
+                }
+            }
+
+            isRunning = false
+            send(toState(runs++, currentTime))
+            afterReplication()
+        }
         close()
-        afterReplication()
+
         println("Simulation stopped")
+
     }
 
     fun plan(event: Event) {
@@ -73,6 +78,6 @@ abstract class Simulation<out S : State>(
 
     protected abstract fun beforeReplication()
 
-    protected abstract fun toState(simTime: Double, lastEvent: MutableCollection<Event>): S
+    protected abstract fun toState(run: Int, simTime: Double): S
 
 }

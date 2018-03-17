@@ -4,6 +4,7 @@ import Core.Event
 import Core.Simulation
 import Core.State
 
+
 class CostumerArrival(arrivalTime: Double) : Event(arrivalTime) {
 
     override fun execute(simulation: Simulation<State>) = with(simulation as NewsstandSimulation) {
@@ -13,9 +14,11 @@ class CostumerArrival(arrivalTime: Double) : Event(arrivalTime) {
         queue.push(customer)
         plan(StartService(currentTime))
     }
+
 }
 
 class StartService(startTime: Double) : Event(startTime) {
+
     override fun execute(simulation: Simulation<State>) = with(simulation as NewsstandSimulation) {
         if (isFree && queue.isNotEmpty()) {
             queue.pop()
@@ -23,11 +26,14 @@ class StartService(startTime: Double) : Event(startTime) {
             isFree = false
         }
     }
+
 }
 
 class CostumerServiceEnded(endTime: Double) : Event(endTime) {
+
     override fun execute(simulation: Simulation<State>) = with(simulation as NewsstandSimulation) {
         isFree = true
         plan(StartService(currentTime))
     }
+
 }

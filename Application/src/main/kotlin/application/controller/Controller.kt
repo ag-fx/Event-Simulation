@@ -1,10 +1,12 @@
 package application.controller
 
-import TestSim.MyTestEventOne
-import TestSim.MyTestSimulation
+import TestSim.Newsstand.NewsstandSimulation
 import application.model.MyModel
 import javafx.beans.property.SimpleStringProperty
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.channels.consumeEach
+import kotlinx.coroutines.experimental.channels.filter
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import tornadofx.*
 import coroutines.JavaFx as onUi
@@ -12,31 +14,30 @@ import coroutines.JavaFx as onUi
 class MyController : Controller() {
 
     private val myModel = MyModel()
-    private  val testSim = MyTestSimulation()
+    private val testSim = NewsstandSimulation()
     val textProperty = SimpleStringProperty("1")
     private var text by textProperty
 
-    fun run() {
-        launch(onUi) {
-          //  testSim.plan(MyTestEventOne())
-            testSim.start()
-                    .consumeEach {
-                        text = "${it.time}"
-                    }
-
-        }
-
+    fun run() = launch(onUi) {
+        testSim.start()
+                .filter(CommonPool) { it.run % 50000 == 0 }
+                .consumeEach {
+                   // println(it)
+                    text = "${it}"
+                }
     }
+
 
     fun speedUp() {
-        testSim.speed *=2
+        testSim.speed *= 2
     }
 
-    fun pause(){
+    fun pause() {
         testSim.pause()
     }
 
-    fun resume(){
+    fun resume() {
         testSim.resume()
     }
+
 }

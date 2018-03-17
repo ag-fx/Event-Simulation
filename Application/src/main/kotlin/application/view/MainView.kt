@@ -8,7 +8,8 @@ class MainView : View("Hello TornadoFX") {
     private val myController: MyController by inject()
 
     override val root = vbox {
-        label(myController.textProperty)
+        prefWidth = 600.0
+        textfield (myController.textProperty)
         myController.run()
         textfield { text = "live ui :)" }
         button("Speed up") { action { myController.speedUp() } }
