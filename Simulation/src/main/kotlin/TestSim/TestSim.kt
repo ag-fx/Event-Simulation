@@ -5,22 +5,26 @@ import Core.Simulation
 import Core.State
 
 
-data class MyTestState(val time: Double, override val running: Boolean, override val events: MutableCollection<Event>) : State
+data class MyTestState(
+        val time: Double,
+        override val running: Boolean,
+        override val events: MutableCollection<Event>
+) : State
 
-class MyTestSimulation : Simulation<MyTestState>() {
-
-    init {
-        plan(Tick(speed))
-        plan(MyTestEventOne())
-    }
-
-    override fun toState(simTime: Double, events: MutableCollection<Event>) = MyTestState(
-            time = simTime,
-            running = true,
-            events = events)
-
-}
-
+//class MyTestSimulation : Simulation<MyTestState>() {
+//
+//    init {
+//        plan(Tick(speed))
+//        plan(MyTestEventOne())
+//    }
+//
+//    override fun toState(simTime: Double, events: MutableCollection<Event>) = MyTestState(
+//            time = simTime,
+//            running = true,
+//            events = events)
+//
+//}
+//
 
 class MyTestEventOne : Event(occurrenceTime = 5.0) {
 

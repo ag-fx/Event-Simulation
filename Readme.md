@@ -1,3 +1,1 @@
-Samle TornadoFX starter app with enabled coroutines :) 
-
-run with gradle :)
+event based simulation using Kotlin, coroutines, TornadoFX
