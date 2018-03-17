@@ -1,83 +1,87 @@
 package Core
 
+import Core.Simulation.State.ReplicationState
+import Core.Simulation.State.SimulationState
+import TestSim.Newsstand.NewsStandState
+import TestSim.Newsstand.NewsstandReplication
+import kotlinx.coroutines.experimental.channels.consumeEach
 import kotlinx.coroutines.experimental.channels.produce
-import org.jetbrains.annotations.TestOnly
-import java.util.*
-import java.util.concurrent.PriorityBlockingQueue
 
-abstract class Simulation<out S : State>(
-        private val maxSimTime: Double = 30 * 24.0 * 60
-) {
+abstract class Simulation<S : State>(val replicationCount: Int) {
 
-    private val timeLine = PriorityBlockingQueue<Event>()
-    private val oneSecond = 1.0
-    private var runs = 0
+    /**
+      *  @return Instance of one replication run.
+      */
+    abstract fun replication(): Replication<S>
 
-    var sleepTime = 0L
 
-    var currentTime = 0.0
-        private set(value) {
-            field = value
-        }
+    /**
+     * This list contains latest states from  each replication
+     */
+    private val replicationFinalStates = mutableListOf<S>()
 
-    var speed = oneSecond * 60
+    /**
+     * Currently running replication. It's here so we can pause and resume replication
+     */
+    private lateinit var currentReplication: Replication<S>
 
-    private var isRunning = true
 
-    protected val rndSeed = Random()
+    private lateinit var lastReplicationState: S
 
+    /**
+     * this list contains every replication that simulation will run.
+     */
+    private val replications = List(replicationCount) { replication() }
+
+
+    sealed class State<out S> {
+        abstract val state: S
+
+        class ReplicationState<out S> (override val state: S) : State<S>()
+        class SimulationState <out S> (override val state: S) : State<S>()
+    }
+
+    /**
+     *  This is will create Channel where simulation and replications states will be send trough
+     */
     fun start() = produce {
-        repeat(5) {
-            beforeReplication()
-
-            while (shouldSimulate()) {
-                if (isSimulationRunning()) {
-                    val currentEvent = timeLine.poll()
-                    currentTime = currentEvent.occurrenceTime
-                    currentEvent.execute(this@Simulation)
-                    //println(currentEvent)
-                    val state = toState(runs++, currentTime)
-                    send(state)
-                }
+        replications.forEach {
+            currentReplication = it
+            it.start().consumeEach {
+                lastReplicationState = it
+                send(ReplicationState(it))
             }
-
-            isRunning = false
-            send(toState(runs++, currentTime))
-            afterReplication()
+            replicationFinalStates += lastReplicationState
+            send(SimulationState(toState(replicationFinalStates)))
         }
-        close()
-
-        println("Simulation stopped")
-
     }
 
-    fun plan(event: Event) {
-        if (event.occurrenceTime >= currentTime)
-            timeLine.add(event)
-        else
-            throw IllegalStateException("Time travel")
-    }
-
-    @TestOnly
-    fun poll() = timeLine.poll()
-
+    /**
+     * @return Simulation state
+     */
+    abstract fun toState(replications: List<S>): S
 
     fun pause() {
-        isRunning = false
+        currentReplication.pause()
     }
 
     fun resume() {
-        isRunning = true
+        currentReplication.resume()
     }
 
-    private fun isSimulationRunning() = isRunning
+        }
 
-    private fun shouldSimulate() = currentTime < maxSimTime && timeLine.isNotEmpty()
+class NewsSim : Simulation<NewsStandState>(5_000) {
 
-    protected abstract fun afterReplication()
+    override fun replication(): Replication<NewsStandState> = NewsstandReplication()
 
-    protected abstract fun beforeReplication()
-
-    protected abstract fun toState(run: Int, simTime: Double): S
+    override fun toState(replications: List<NewsStandState>) = NewsStandState(
+            avgQueueSize = replications.map { it.avgQueueSize }.average(),
+            avgWaitTime  = replications.map { it.avgWaitTime  }.average(),
+            currentTime  = -1.0,
+            running      = false,
+            run          = -1,
+            stopped      = false
+    )
 
 }

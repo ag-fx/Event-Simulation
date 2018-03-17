@@ -6,7 +6,7 @@ interface Statistical {
     var arrivedToSystem: Double
 }
 
-class StatisticQueue<T : Statistical, out S : State>(private val simCore: Simulation<S>) {
+class StatisticQueue<T : Statistical, out S : State>(private val simCore: Replication<S>) {
 
     private val queue           = LinkedList<T>() as Queue<T>
     private var lastChange      = 0.0

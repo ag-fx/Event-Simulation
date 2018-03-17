@@ -9,7 +9,16 @@ class MainView : View("Hello TornadoFX") {
 
     override val root = vbox {
         prefWidth = 600.0
-        textfield (myController.textProperty)
+        hbox {
+            label("Replication")
+            spacer()
+            textfield(myController.textProperty)
+        }
+        hbox {
+            label("Simulation")
+            spacer()
+            textfield(myController.simTextProperty)
+        }
         myController.run()
         textfield { text = "live ui :)" }
         button("Speed up") { action { myController.speedUp() } }

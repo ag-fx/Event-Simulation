@@ -1,18 +1,12 @@
 package AirCarRental
 
-import AirCarRental.Entities.Building
-import AirCarRental.Entities.MiniBus
-import Core.Simulation
-import Core.State
-import java.util.*
-
 //data class SimTate(val avgWaitTime: Long = 5, override var running: Boolean) : State
 
 //class AirCarRentalSimulation(
 //        private val numberOFMiniBuses: Int,
 //        private val employees: Int,
 //        maxSimTime: Long
-//) : Simulation<SimTate>(maxSimTime) {
+//) : Replication<SimTate>(maxSimTime) {
 //
 //    private val rndService    = Random(rndSeed.nextLong())
 //

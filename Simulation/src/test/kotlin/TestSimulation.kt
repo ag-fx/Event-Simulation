@@ -1,13 +1,13 @@
 package test
 
-import TestSim.Newsstand.NewsstandSimulation
+import TestSim.Newsstand.NewsstandReplication
 import kotlinx.coroutines.experimental.channels.consumeEach
 import kotlinx.coroutines.experimental.runBlocking
 
 
 fun main(args: Array<String>) = runBlocking {
 
-    val sim = NewsstandSimulation()
+    val sim = NewsstandReplication()
 
     sim.start().consumeEach {
         println("${it.avgWaitTime}\t${it.avgQueueSize}" )
