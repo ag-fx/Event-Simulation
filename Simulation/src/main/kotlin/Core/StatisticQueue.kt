@@ -6,7 +6,7 @@ interface Statistical {
     var arrivedToSystem: Double
 }
 
-class StatisticQueue<T : Statistical, out S : State>(private val simCore: Replication<S>) {
+class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>) {
 
     private val queue           = LinkedList<T>() as Queue<T>
     private var lastChange      = 0.0
@@ -43,4 +43,12 @@ class StatisticQueue<T : Statistical, out S : State>(private val simCore: Replic
 
     fun isNotEmpty() = queue.isNotEmpty()
 
+    fun clear(){
+        queue.clear()
+        lastChange      = 0.0
+        totalTime       = 0.0
+        weightTime      = 0.0
+        totalWaitTime   = 0.0
+        served          = 0.0
+    }
 }

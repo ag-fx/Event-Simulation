@@ -12,6 +12,8 @@ class MainView : View("Hello TornadoFX") {
         hbox {
             label("Replication")
             spacer()
+            label(myController.simTimeProperty)
+            spacer()
             textfield(myController.textProperty)
         }
         hbox {
@@ -24,5 +26,7 @@ class MainView : View("Hello TornadoFX") {
         button("Speed up") { action { myController.speedUp() } }
         button("Pause") { action { myController.pause() } }
         button("Resume") { action { myController.resume() } }
+        button("Stop watching  ") { action { myController.stopWatching() } }
+        button("Start watching ") { action { myController.startWatching() } }
     }
 }
