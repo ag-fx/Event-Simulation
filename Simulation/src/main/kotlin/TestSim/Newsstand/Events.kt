@@ -1,13 +1,14 @@
 package TestSim.Newsstand
 
 import Core.Event
-import Core.Replication
-import Core.State
 
+abstract class NewsstandEvent(time: Double) : Event(time) {
+    lateinit var core: NewsstandSimulation
+}
 
-class CostumerArrival(arrivalTime: Double) : Event(arrivalTime) {
+class CostumerArrival(arrivalTime: Double) : NewsstandEvent(arrivalTime) {
 
-    override fun execute(replication: Replication<State>) = with(replication as NewsstandReplication) {
+    override fun execute() = with(core) {
         val nextArrival = CostumerArrival(currentTime + rndArrival.next())
         plan(nextArrival)
         val customer = Customer(arrivedToSystem = currentTime)
@@ -17,9 +18,9 @@ class CostumerArrival(arrivalTime: Double) : Event(arrivalTime) {
 
 }
 
-class StartService(startTime: Double) : Event(startTime) {
+class StartService(startTime: Double) : NewsstandEvent(startTime) {
 
-    override fun execute(replication: Replication<State>) = with(replication as NewsstandReplication) {
+    override fun execute() = with(core) {
         if (isFree && queue.isNotEmpty()) {
             queue.pop()
             plan(CostumerServiceEnded(currentTime + costumerService.next()))
@@ -29,9 +30,9 @@ class StartService(startTime: Double) : Event(startTime) {
 
 }
 
-class CostumerServiceEnded(endTime: Double) : Event(endTime) {
+class CostumerServiceEnded(endTime: Double) : NewsstandEvent(endTime) {
 
-    override fun execute(replication: Replication<State>) = with(replication as NewsstandReplication) {
+    override fun execute() = with(core) {
         isFree = true
         plan(StartService(currentTime))
     }

@@ -1,87 +1,78 @@
 package Core
 
-import Core.Simulation.State.ReplicationState
-import Core.Simulation.State.SimulationState
-import TestSim.Newsstand.NewsStandState
-import TestSim.Newsstand.NewsstandReplication
-import kotlinx.coroutines.experimental.channels.consumeEach
-import kotlinx.coroutines.experimental.channels.produce
-
-abstract class Simulation<S : State>(val replicationCount: Int) {
-
-    /**
-      *  @return Instance of one replication run.
-      */
-    abstract fun replication(): Replication<S>
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
+import java.util.*
+import java.util.concurrent.PriorityBlockingQueue
 
 
-    /**
-     * This list contains latest states from  each replication
-     */
-    private val replicationFinalStates = mutableListOf<S>()
+abstract class SimCore<State>(private val maxSimTime: Double, private val numberOfReplications: Int) {
 
-    /**
-     * Currently running replication. It's here so we can pause and resume replication
-     */
-    private lateinit var currentReplication: Replication<S>
+    private val simulation = BehaviorSubject.create<State>().toSerialized().apply { observeOn(Schedulers.newThread()) }
+    fun simulation(): Observable<State> = simulation
+    private val timeLine = PriorityBlockingQueue<Event>()
+    private var isRunning = true
 
+    protected var stop = false
 
-    private lateinit var lastReplicationState: S
+    var currentTime = 0.0
+        private set(value) {
+            field = value
+        }
 
-    /**
-     * this list contains every replication that simulation will run.
-     */
-    private val replications = List(replicationCount) { replication() }
+    private fun shouldSimulate() = currentTime < maxSimTime && timeLine.isNotEmpty()
 
-
-    sealed class State<out S> {
-        abstract val state: S
-
-        class ReplicationState<out S> (override val state: S) : State<S>()
-        class SimulationState <out S> (override val state: S) : State<S>()
+    fun start() {
+        beforeSimulation()
+        for (i in 0..numberOfReplications) {
+            beforeReplication()
+            simulate()
+            afterReplication()
+        }
+        afterSimulation()
     }
 
-    /**
-     *  This is will create Channel where simulation and replications states will be send trough
-     */
-    fun start() = produce {
-        replications.forEach {
-            currentReplication = it
-            it.start().consumeEach {
-                lastReplicationState = it
-                send(ReplicationState(it))
+    private fun simulate() {
+        var run = 0
+        while (shouldSimulate()) {
+            if (isSimulationRunning()) {
+                val currentEvent = timeLine.poll()
+                currentTime = currentEvent.occurrenceTime
+                currentEvent.execute()
+                simulation.onNext(toState(run++))
             }
-            replicationFinalStates += lastReplicationState
-            send(SimulationState(toState(replicationFinalStates)))
         }
     }
 
-    /**
-     * @return Simulation state
-     */
-    abstract fun toState(replications: List<S>): S
-
-    fun pause() {
-        currentReplication.pause()
+    open fun plan(event: Event) {
+        if (event.occurrenceTime >= currentTime)
+            timeLine.add(event)
+        else
+            throw IllegalStateException("Time travel")
     }
 
-    fun resume() {
-        currentReplication.resume()
+    private fun isSimulationRunning() = isRunning && !stop
+
+    protected abstract fun toState(run: Int): State
+    protected abstract fun beforeSimulation()
+    protected abstract fun afterSimulation()
+    protected abstract fun beforeReplication()
+    protected abstract fun afterReplication()
+
+    protected val rndSeed = Random()
+
+    protected fun clear(){
+        timeLine.clear()
+        currentTime = 0.0
     }
 
-        }
+    fun pause(){
+        isRunning = false
+    }
 
-class NewsSim : Simulation<NewsStandState>(5_000) {
-
-    override fun replication(): Replication<NewsStandState> = NewsstandReplication()
-
-    override fun toState(replications: List<NewsStandState>) = NewsStandState(
-            avgQueueSize = replications.map { it.avgQueueSize }.average(),
-            avgWaitTime  = replications.map { it.avgWaitTime  }.average(),
-            currentTime  = -1.0,
-            running      = false,
-            run          = -1,
-            stopped      = false
-    )
+    fun resume(){
+        isRunning = true
+    }
 
 }

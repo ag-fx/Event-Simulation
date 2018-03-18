@@ -6,7 +6,7 @@ package Core
  */
 abstract class Event(val occurrenceTime: Double) : Comparable<Event> {
 
-    abstract fun execute(replication: Replication<State>)
+    abstract fun execute()
 
     override fun compareTo(other: Event) = occurrenceTime.compareTo(other.occurrenceTime)
 

@@ -4,6 +4,7 @@ mainClassName = 'application.app.MyApp'
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile 'no.tornado:tornadofx:1.7.15'
+    compile 'com.github.thomasnield:rxkotlinfx:2.2.2'
     compile project(':Simulation')
 
 }

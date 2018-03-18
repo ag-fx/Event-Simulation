@@ -1,24 +1,18 @@
 package application.controller
 
-import Core.NewsSim
-import Core.Simulation
-import TestSim.Newsstand.NewsstandReplication
+import TestSim.Newsstand.NewsstandSimulation
 import application.model.MyModel
+import com.github.thomasnield.rxkotlinfx.observeOnFx
+import com.github.thomasnield.rxkotlinfx.subscribeOnFx
+import io.reactivex.schedulers.Schedulers
 import javafx.beans.property.SimpleStringProperty
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.channels.consumeEach
-import kotlinx.coroutines.experimental.channels.filter
-import kotlinx.coroutines.experimental.channels.filterIndexed
-import kotlinx.coroutines.experimental.launch
 import tornadofx.*
 import coroutines.JavaFx as onUi
-import tornadofx.getValue
-import tornadofx.setValue
 
 class MyController : Controller() {
 
     private val myModel = MyModel()
-    private val testSim = NewsSim()// NewsstandReplication()
+    private val testSim = NewsstandSimulation()// NewsstandReplication()
     val textProperty = SimpleStringProperty("1")
     private var text by textProperty
 
@@ -26,19 +20,30 @@ class MyController : Controller() {
     var simText by simTextProperty
 
 
-    fun run() = launch(onUi) {
-        testSim.start()
-                .filterIndexed { i, s -> (s is Simulation.State.ReplicationState && i % 1_0000 == 0) || s is Simulation.State.SimulationState }
-                .consumeEach {
-                    when (it) {
-                        is Simulation.State.ReplicationState -> {
-                            text = "${it.state.avgWaitTime}"
-                        }
-                        is Simulation.State.SimulationState -> {
-                            simText = "${it.state.avgWaitTime}"
-                        }
-                    }
+    fun run() = runAsync {
+        testSim.simulation()
+                .observeOn(Schedulers.io())
+                .filter { it.run % 5_000 == 0 }
+                .subscribeOnFx()
+                .observeOnFx()
+                .subscribe {
+                    println(it)
+                    text = "${it.avgWaitTime}"
                 }
+
+        testSim.start()
+//        testSim.start()
+//                .filterIndexed { i, s -> (s is Simulation.State.ReplicationState && i % 1_0000 == 0) || s is Simulation.State.SimulationState }
+//                .consumeEach {
+//                    when (it) {
+//                        is Simulation.State.ReplicationState -> {
+//                            text = "${it.state.avgWaitTime}"
+//                        }
+//                        is Simulation.State.SimulationState -> {
+//                            simText = "${it.state.avgWaitTime}"
+//                        }
+//                    }
+//                }
     }
 
 
@@ -47,11 +52,11 @@ class MyController : Controller() {
     }
 
     fun pause() {
-          testSim.pause()
+//          testSim.pause()
     }
 
     fun resume() {
-         testSim.resume()
+//         testSim.resume()
     }
 
 }
