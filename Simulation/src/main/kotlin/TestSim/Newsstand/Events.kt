@@ -1,6 +1,6 @@
 package TestSim.Newsstand
 
-import Core.Event
+import core.Event
 
 abstract class NewsstandEvent(time: Double) : Event(time) {
     lateinit var core: NewsstandSimulation

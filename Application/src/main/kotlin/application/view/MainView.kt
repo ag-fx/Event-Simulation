@@ -1,14 +1,15 @@
+
 package application.view
 
 import application.controller.MyController
 import tornadofx.*
-
 class MainView : View("Hello TornadoFX") {
 
     private val myController: MyController by inject()
 
     override val root = vbox {
         prefWidth = 600.0
+
         hbox {
             label("Replication")
             spacer()
@@ -29,4 +30,10 @@ class MainView : View("Hello TornadoFX") {
         button("Stop watching  ") { action { myController.stopWatching() } }
         button("Start watching ") { action { myController.startWatching() } }
     }
+}
+
+fun main(args: Array<String>) {
+    val nejakyString = "ahoj"
+
+
 }

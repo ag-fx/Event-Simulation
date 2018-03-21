@@ -1,6 +1,6 @@
-package Core
+package core
 
-abstract class Event(val occurrenceTime: Double) : Comparable<Event> {
+abstract class Event(var occurrenceTime: Double) : Comparable<Event> {
 
     abstract fun execute()
 
@@ -10,7 +10,8 @@ abstract class Event(val occurrenceTime: Double) : Comparable<Event> {
 
 }
 
-internal class Tick<S:State>(occurrenceTime: Double, private val core: SimCore<S>) : Event(occurrenceTime) {
+internal class Tick<S:State>(occurrenceTime: Double) : Event(occurrenceTime){
+    lateinit var core: SimCore<S>
 
     override fun execute() = with(core) {
         if (isWatched()) {

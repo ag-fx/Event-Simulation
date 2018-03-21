@@ -1,4 +1,4 @@
-package Core
+package core
 
 import java.util.*
 
@@ -40,6 +40,8 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
     fun averageSize() = weightTime / totalTime
 
     fun isEmpty() = queue.isEmpty()
+
+    fun size() = queue.size
 
     fun isNotEmpty() = queue.isNotEmpty()
 

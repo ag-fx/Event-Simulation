@@ -1,7 +1,6 @@
 package application.controller
 
 import TestSim.Newsstand.NewsstandSimulation
-import application.model.MyModel
 import javafx.beans.property.SimpleStringProperty
 import kotlinx.coroutines.experimental.channels.consumeEach
 import kotlinx.coroutines.experimental.launch
@@ -47,6 +46,10 @@ class MyController : Controller() {
 
     fun speedUp() {
          testSim.speed *= 2
+    }
+
+    fun slowDown() {
+        testSim.speed /= 2
     }
 
     fun pause() {

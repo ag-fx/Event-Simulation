@@ -1,6 +1,7 @@
-package Core
+package core
 
 import kotlinx.coroutines.experimental.channels.Channel
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.concurrent.PriorityBlockingQueue
@@ -12,9 +13,10 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     private val timeLine = PriorityBlockingQueue<Event>()
     private val replicationStates = mutableListOf<S>()
-    private val oneSecond = 1/60.0 //1.0
+    private val oneSecond = 1.0
     private var runs = 0
     private var isWatched = true
+    var log = true
 
     var sleepTime = 1000L
 
@@ -23,16 +25,16 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
             field = value
         }
 
-    var speed = oneSecond //* 60
+    open var speed = oneSecond //* 60
 
-    private var isRunning = true
+    protected var isRunning = true
 
     var stop = false
         private set(value) {
             field = value
         }
 
-     fun start() = launch {
+    fun start() = launch {
         beforeSimulation()
         repeat(replications) {
             beforeReplication()
@@ -48,17 +50,27 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     }
 
     private suspend fun simulate() {
-         if (isWatched())
-             planTick()
+        if (isWatched())
+            planTick()
 
         while (shouldSimulate()) {
+
             if (isSimulationRunning()) {
                 val currentEvent = timeLine.poll()
                 currentTime = currentEvent.occurrenceTime
                 currentEvent.execute()
-                val state = toState(runs++, currentTime)
-                if (isWatched())
+
+                if (log)
+                    println(currentEvent)
+
+                if (isWatched()) {
+                    val state = toState(runs++, currentTime)
                     currentReplicationChannel.send(state)
+                }
+
+
+            } else {
+                delay(250)
             }
 
             if (stop) {
@@ -70,8 +82,11 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         }
     }
 
+    private val tick = Tick<S>(currentTime + speed)
+
     fun planTick() {
-        val tick = Tick(currentTime + speed,this@SimCore)
+        tick.core = this
+        tick.occurrenceTime = currentTime + speed
         timeLine.add(tick)
     }
 
