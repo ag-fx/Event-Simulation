@@ -10,17 +10,17 @@ class MinibusArrivalTerminalTwo(private val minibus: Minibus, time: Double) : Ac
         var totalTimeToEnterBus = 0.0
         lateinit var currentCustomer: Customer
 
-        while (terminalTwo.queue.isNotEmpty() && minibus.isNotFull()) {
-            currentCustomer = terminalTwo.queue.pop()
-            totalTimeToEnterBus += rndTimeToEnterBus.next()
-            minibus.seats.push(currentCustomer)
-        }
+//        while (terminalTwo.queue.isNotEmpty() && minibus.isNotFull()) {
+//            currentCustomer = terminalTwo.queue.pop()
+//            totalTimeToEnterBus += rndTimeToEnterBus.next()
+//            minibus.seats.push(currentCustomer)
+//        }
 
-        plan(MinibusGoTo(
+        plan(EnterToMinibus(
                 minibus = minibus,
-                destination = Buildings.AirCarRental,
-                source = Buildings.TerminalTwo,
-                time = currentTime + totalTimeToEnterBus
+                terminal = terminalTwo,
+                numberOfCustomersInQueue = terminalTwo.queue.size(),
+                time = currentTime
         ))
 
         //zatial pre istotu

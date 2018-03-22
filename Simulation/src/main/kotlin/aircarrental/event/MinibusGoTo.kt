@@ -20,9 +20,9 @@ class MinibusGoTo(
 
         val timeToGetThere = (source.distanceToNext() / minibus.averageSpeed)
         when (destination) {
-            Buildings.TerminalOne -> plan(MinibusArrivalTerminalOne(minibus, currentTime + timeToGetThere))
-            Buildings.TerminalTwo -> plan(MinibusArrivalTerminalTwo(minibus, currentTime + timeToGetThere))
-            Buildings.AirCarRental -> plan(MinibusArrivalAirCarRental(minibus, currentTime + timeToGetThere))
+            Buildings.TerminalOne  -> plan(MinibusArrivalTerminalOne  (minibus, currentTime + timeToGetThere))
+            Buildings.TerminalTwo  -> plan(MinibusArrivalTerminalTwo  (minibus, currentTime + timeToGetThere))
+            Buildings.AirCarRental -> plan(MinibusArrivalAirCarRental (minibus, currentTime + timeToGetThere))
         }
 
     }

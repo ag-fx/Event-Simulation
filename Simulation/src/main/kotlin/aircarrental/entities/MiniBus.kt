@@ -17,7 +17,6 @@ data class Minibus(
         var distanceToDestination: Double
 ) {
     fun isNotFull() = seats.size() <= capacity
-
     /**
      * @return distance in meters from source
      */

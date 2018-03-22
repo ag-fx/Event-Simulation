@@ -1,8 +1,10 @@
 package aircarrental.event
 
 import aircarrental.entities.Buildings
+import aircarrental.entities.Buildings.*
 import aircarrental.entities.Customer
 import aircarrental.entities.Minibus
+import aircarrental.entities.Terminal
 
 class MinibusArrivalTerminalOne(private val minibus: Minibus, time: Double) : AcrEvent(time) {
 
@@ -10,19 +12,20 @@ class MinibusArrivalTerminalOne(private val minibus: Minibus, time: Double) : Ac
 
         var totalTimeToEnterBus = 0.0
         lateinit var currentCustomer: Customer
-        //TODO bojim sa tohto nastupovania, ze to budu zle vysledky v statistickej triede
-        while (terminalOne.queue.isNotEmpty() && minibus.isNotFull()) {
-            currentCustomer = terminalOne.queue.pop()
-            val timeToEnter = rndTimeToEnterBus.next()
-            totalTimeToEnterBus += timeToEnter
-            minibus.seats.push(currentCustomer)
-        }
 
-        plan(MinibusGoTo(
+        //TODO bojim sa tohto nastupovania, ze to budu zle vysledky v statistickej triede
+//        while (terminalOne.queue.isNotEmpty() && minibus.isNotFull()) {
+//            currentCustomer = terminalOne.queue.pop()
+//            val timeToEnter = rndTimeToEnterBus.next()
+//            totalTimeToEnterBus += timeToEnter
+//            minibus.seats.push(currentCustomer)
+//        }
+
+        plan(EnterToMinibus(
                 minibus = minibus,
-                destination = Buildings.TerminalTwo,
-                source = Buildings.TerminalOne,
-                time = currentTime + totalTimeToEnterBus
+                terminal = terminalOne,
+                numberOfCustomersInQueue = terminalOne.queue.size(),
+                time = currentTime
         ))
 
         //zatial pre istotu
@@ -33,3 +36,4 @@ class MinibusArrivalTerminalOne(private val minibus: Minibus, time: Double) : Ac
     override fun toString() = "Minibus ${minibus.id} ${super.toString()}"
 
 }
+
