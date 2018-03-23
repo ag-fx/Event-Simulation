@@ -39,10 +39,10 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         repeat(replications) {
             beforeReplication()
             simulate()
+            afterReplication()
             replicationStates += toState(runs, currentTime)
             if (!stop)
                 afterReplicationChannel.send(replicationStates)
-            afterReplication()
         }
         afterSimulation()
         isRunning = false
@@ -119,7 +119,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     protected val rndSeed = Random()
 
     fun log(s: Any) {
-        if (log)
+        if (log && !s.toString().contains("Planning Terminal") && !s.toString().contains("TerminalOneCustomerArrival")&& !s.toString().contains("TerminalTwoCustomerArrival"))
             println(s)
     }
 
