@@ -1,14 +1,12 @@
 package aircarrental.event
 
-import aircarrental.entities.Buildings
-import aircarrental.entities.Minibus
-import aircarrental.entities.distanceToNext
+import aircarrental.entities.*
 
 class MinibusGoTo(
-        private val minibus: Minibus,
-        private val destination: Buildings,
-        private val source: Buildings,
-        time: Double
+    private val minibus: Minibus,
+    private val destination: Buildings,
+    private val source: Buildings,
+    time: Double
 ) : AcrEvent(time) {
 
     override fun execute() = with(core) {
@@ -20,9 +18,9 @@ class MinibusGoTo(
 
         val timeToGetThere = (source.distanceToNext() / minibus.averageSpeed)
         when (destination) {
-            Buildings.TerminalOne  -> plan(MinibusArrivalTerminalOne  (minibus, currentTime + timeToGetThere))
-            Buildings.TerminalTwo  -> plan(MinibusArrivalTerminalTwo  (minibus, currentTime + timeToGetThere))
-            Buildings.AirCarRental -> plan(MinibusArrivalAirCarRental (minibus, currentTime + timeToGetThere))
+            Buildings.TerminalOne -> plan(MinibusArrivalTerminalOne(minibus, currentTime + timeToGetThere))
+            Buildings.TerminalTwo -> plan(MinibusArrivalTerminalTwo(minibus, currentTime + timeToGetThere))
+            Buildings.AirCarRental -> plan(MinibusArrivalAirCarRental(minibus, currentTime + timeToGetThere))
         }
 
     }

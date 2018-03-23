@@ -53,4 +53,5 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
         totalWaitTime   = 0.0
         served          = 0.0
     }
+
 }

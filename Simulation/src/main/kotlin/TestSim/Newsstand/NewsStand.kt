@@ -19,6 +19,7 @@ data class NewsStandState(
 class NewsstandSimulation : SimCore<NewsStandState>(maxSimTime = 10_000_000.0, replications = 100) {
 
     override fun afterSimulation() {
+
     }
 
     override fun beforeSimulation() {

@@ -11,7 +11,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     val currentReplicationChannel = Channel<S>()
     val afterReplicationChannel = Channel<List<S>>()
 
-    private val timeLine = PriorityBlockingQueue<Event>()
+    private val timeline = PriorityBlockingQueue<Event>()
     private val replicationStates = mutableListOf<S>()
     private val oneSecond = 1.0
     private var runs = 0
@@ -22,7 +22,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     var currentTime = 0.0
         private set(value) {
-            field = value
+            field = if (value < field && value != 0.0) throw IllegalStateException("Time travel") else value
         }
 
     open var speed = oneSecond //* 60
@@ -42,7 +42,6 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
             replicationStates += toState(runs, currentTime)
             if (!stop)
                 afterReplicationChannel.send(replicationStates)
-            clear()
             afterReplication()
         }
         afterSimulation()
@@ -56,12 +55,12 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         while (shouldSimulate()) {
 
             if (isSimulationRunning()) {
-                val currentEvent = timeLine.poll()
-                currentTime = currentEvent.occurrenceTime
-                currentEvent.execute()
+                val tl = timeline
 
-                if (log)
-                    println(currentEvent)
+                val currentEvent = timeline.poll()
+                currentTime = currentEvent.occurrenceTime
+                log(currentEvent)
+                currentEvent.execute()
 
                 if (isWatched()) {
                     val state = toState(runs++, currentTime)
@@ -82,37 +81,54 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         }
     }
 
+    private suspend fun executeEvent() {
+
+    }
+
     private val tick = Tick<S>(currentTime + speed)
 
     fun planTick() {
         tick.core = this
         tick.occurrenceTime = currentTime + speed
-        timeLine.add(tick)
+        timeline.add(tick)
     }
 
     open fun plan(event: Event) {
         if (event.occurrenceTime >= currentTime)
-            timeLine.add(event)
+            timeline.add(event)
         else
             throw IllegalStateException("Time travel")
     }
 
-
     private fun isSimulationRunning() = isRunning && !stop
-    private fun shouldSimulate() = currentTime < maxSimTime && timeLine.isNotEmpty()
 
-    protected abstract fun afterReplication()
+    private fun shouldSimulate() = currentTime < maxSimTime && timeline.isNotEmpty()
+
+    protected open fun afterReplication() {
+        //TODO osterit posledne eventy v kalendari
+    }
+
     protected abstract fun beforeReplication()
-    protected abstract fun afterSimulation()
+    protected open fun afterSimulation() {
+        afterReplicationChannel.close()
+        currentReplicationChannel.close()
+    }
+
     protected abstract fun beforeSimulation()
     protected abstract fun toState(run: Int, simTime: Double): S
-    protected val rndSeed = Random()
+    protected val rndSeed = Random() // TODO potom zmenit
+
+    fun log(s: Any) {
+        if (log)
+            println(s)
+    }
 
     open fun clear() {
         currentTime = 0.0
         runs = 0
         isRunning = true
         stop = false
+        timeline.clear()
     }
 
     fun pause() {
@@ -138,6 +154,4 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         isWatched = false
     }
 
-
 }
-
