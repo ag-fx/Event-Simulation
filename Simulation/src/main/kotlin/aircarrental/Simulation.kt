@@ -73,14 +73,14 @@ class AirCarRentalSimulation(
 
     // Doba nástupu cestujúceho je: p = 12s ± 2s
     val rndTimeToEnterBus = RandomRange(
-        min = 12.0 - 2.0,
-        max = 12.0 + 2.0,
+        min = (12.0 - 2.0),
+        max = (12.0 + 2.0),
         rndSeedNumber = rndSeed.nextLong())
 
     // Doba výstupu cestujúceho je: r = 8s ± 4s
     val rndTimeToExitBus = RandomRange(
-        min = 8.0 - 4.0,
-        max = 8.0 + 4.0,
+        min = (8.0 - 4.0),
+        max = (8.0 + 4.0),
         rndSeedNumber = rndSeed.nextLong()
     )
     //endregion
