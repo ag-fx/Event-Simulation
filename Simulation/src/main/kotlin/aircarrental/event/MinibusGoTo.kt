@@ -10,16 +10,18 @@ class MinibusGoTo(
 ) : AcrEvent(time) {
 
     override fun execute() = with(core) {
+
         minibus.apply {
             destination = this@MinibusGoTo.destination
             source = this@MinibusGoTo.source
             leftAt = currentTime
         }
 
-        val timeToGetThere = (source.distanceToNext() / minibus.averageSpeed)
+        val timeToGetThere = source.distanceToNext() / minibus.averageSpeed
+
         when (destination) {
-            Buildings.TerminalOne -> plan(MinibusArrivalTerminalOne(minibus, currentTime + timeToGetThere))
-            Buildings.TerminalTwo -> plan(MinibusArrivalTerminalTwo(minibus, currentTime + timeToGetThere))
+            Buildings.TerminalOne  -> plan(MinibusArrivalTerminalOne (minibus, currentTime + timeToGetThere))
+            Buildings.TerminalTwo  -> plan(MinibusArrivalTerminalTwo (minibus, currentTime + timeToGetThere))
             Buildings.AirCarRental -> plan(MinibusArrivalAirCarRental(minibus, currentTime + timeToGetThere))
         }
 

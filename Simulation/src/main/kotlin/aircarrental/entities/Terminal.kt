@@ -3,20 +3,21 @@ package aircarrental.entities
 import aircarrental.AirCarRentalState
 import aircarrental.entities.Customer
 import core.StatisticQueue
+import core.StatisticalPriorityQueue
 
 
 enum class Buildings { TerminalOne, TerminalTwo, AirCarRental }
 
 
 data class Terminal(
-    var arrivals:Int = 0,
+    var arrivals: Int = 0,
     val description: Buildings,
     val queue: StatisticQueue<Customer, AirCarRentalState>
 )
 
 data class CarRental(
     val description: Buildings,
-    val queue: StatisticQueue<Customer, AirCarRentalState>,
+    val queue: StatisticalPriorityQueue<Customer, AirCarRentalState>,
     val employees: List<Employee>
 )
 
@@ -33,3 +34,8 @@ fun Buildings.distanceToNext() = when (this) {
     Buildings.AirCarRental -> 6400.0
 }
 
+fun Buildings.nextStop() = when (this) {
+    Buildings.TerminalOne -> Buildings.TerminalTwo
+    Buildings.TerminalTwo -> Buildings.AirCarRental
+    Buildings.AirCarRental -> Buildings.TerminalOne
+}

@@ -3,7 +3,7 @@ package aircarrental.event
 import aircarrental.entities.*
 
 class ExitMinibus(
-    val minibus: Minibus,
+    private val minibus: Minibus,
     var time: Double
 ) : AcrEvent(time) {
 
@@ -12,18 +12,20 @@ class ExitMinibus(
             val exitingCustomer = minibus.seats.pop()
             carRental.queue.push(exitingCustomer)
 
-            log("$exitingCustomer exiting bus  at $occurrenceTime")
+            log("$exitingCustomer exiting bus ${minibus.id}  at $occurrenceTime")
 
             carRental.employees
                 .firstOrNull(Employee::isNotBusy)
                 ?.let {
-                    plan(Service(currentTime))
+                    plan(Service(it,currentTime))
+                    it.isBusy = true
                 }
         }
 
         if (minibus.isNotEmpty()) {
             occurrenceTime = currentTime + rndTimeToExitBus.next()
             plan(this@ExitMinibus)
+
         } else {
             plan(MinibusGoTo(
                 minibus = minibus,

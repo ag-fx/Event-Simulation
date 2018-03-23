@@ -11,7 +11,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     val currentReplicationChannel = Channel<S>()
     val afterReplicationChannel = Channel<List<S>>()
 
-    private val timeline = PriorityBlockingQueue<Event>()
+    private val timeline = PriorityQueue<Event>()
     private val replicationStates = mutableListOf<S>()
     private val oneSecond = 1.0
     private var runs = 0
@@ -95,7 +95,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     open fun plan(event: Event) {
         if (event.occurrenceTime >= currentTime)
-            timeline.add(event)
+            timeline.add(event.also { log("Planning $it") })
         else
             throw IllegalStateException("Time travel")
     }
@@ -116,7 +116,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     protected abstract fun beforeSimulation()
     protected abstract fun toState(run: Int, simTime: Double): S
-    protected val rndSeed = Random() // TODO potom zmenit
+    protected val rndSeed = Random()
 
     fun log(s: Any) {
         if (log)

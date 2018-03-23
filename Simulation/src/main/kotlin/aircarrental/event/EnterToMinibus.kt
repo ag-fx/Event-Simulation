@@ -13,8 +13,7 @@ class EnterToMinibus(
         if (minibus.isNotFull() && terminal.queue.isNotEmpty()) {
             val customer = terminal.queue.pop()
             minibus.enter(customer)
-            if (log)
-                println("Customer ${customer.id} entering at $currentTime")
+            log("Customer ${customer.id} entering at $currentTime")
         }
 
         if (minibus.isNotFull() && terminal.queue.isNotEmpty()) {
@@ -24,12 +23,12 @@ class EnterToMinibus(
             }
 
         } else {
-            when (terminal.description) {
-                Buildings.TerminalOne -> plan(MinibusGoTo(minibus, Buildings.TerminalTwo, Buildings.TerminalOne, currentTime))
-                Buildings.TerminalTwo -> plan(MinibusGoTo(minibus, Buildings.AirCarRental, Buildings.TerminalTwo, currentTime))
-                Buildings.AirCarRental -> throw IllegalStateException("Poeple don't get on bus in AirCarRental")
-            }
-
+            plan(MinibusGoTo(
+                minibus = minibus,
+                destination = terminal.description.nextStop(),
+                source = terminal.description,
+                time = currentTime
+            ))
         }
 
     }

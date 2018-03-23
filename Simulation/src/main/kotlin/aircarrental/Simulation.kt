@@ -10,6 +10,7 @@ import aircarrental.event.TerminalTwoCustomerArrival
 import core.Event
 import core.SimCore
 import core.StatisticQueue
+import core.StatisticalPriorityQueue
 
 
 class AirCarRentalSimulation(
@@ -34,8 +35,8 @@ class AirCarRentalSimulation(
                 source = Buildings.AirCarRental,
                 destination = Buildings.TerminalOne,
                 minibus = it,
-                time = currentTime)
-            )
+                time = currentTime
+            ))
         }
 
         val terminalOneArrival = TerminalOneCustomerArrival(currentTime + rndArrivalTerminalOne.next())
@@ -65,8 +66,8 @@ class AirCarRentalSimulation(
         carRental.employees.forEach { it.isBusy = false }
         minibuses.forEach {
             it.destination = Buildings.TerminalOne
-            it.source      = Buildings.AirCarRental
-            it.leftAt      = 0.0
+            it.source = Buildings.AirCarRental
+            it.leftAt = 0.0
             it.seats.clear()
         }
         totalCustomersTime = 0.0
@@ -96,7 +97,7 @@ class AirCarRentalSimulation(
 
     val carRental = CarRental(
         description = Buildings.AirCarRental,
-        queue = StatisticQueue(this),
+        queue = StatisticalPriorityQueue(this),
         employees = List(conf.numberOfEmployees) { Employee() }
     )
 
@@ -110,6 +111,7 @@ class AirCarRentalSimulation(
 
     /**
      * same as [rndArrivalTerminalOne] but with 19
+     *
      */
     val rndArrivalTerminalTwo = ExponentialRandom(19.0 / (60.0 * 60.0), rndSeed.nextLong())
 
@@ -141,7 +143,7 @@ class AirCarRentalSimulation(
         avgQueueWaitTimeTerminalTwo = terminalTwo.queue.averageWaitTime(),
         avgQueueSizeTerminalOne = terminalOne.queue.averageSize(),
         avgQueueSizeTerminalTwo = terminalTwo.queue.averageSize(),
-        customersTimeInSystem = totalCustomersTime/numberOfServedCustomers,
+        customersTimeInSystem = totalCustomersTime / numberOfServedCustomers,
         totalCustomersTime = totalCustomersTime,
         numberOfServedCustomers = numberOfServedCustomers,
         running = isRunning,

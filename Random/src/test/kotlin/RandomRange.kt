@@ -1,3 +1,4 @@
+import XRandom.ExponentialRandom
 import XRandom.RandomRange
 import io.kotlintest.matchers.fail
 import io.kotlintest.specs.StringSpec
@@ -7,6 +8,12 @@ class RandomRangeTes : StringSpec() {
     init {
 
         val r = Random()
+        "random test "{
+            val x = ExponentialRandom(43.0 / (60.0 * 60.0))
+            repeat(500){
+                println(x.next())
+            }
+        }
         repeat(100) {
             val min = Math.abs(r.nextInt() * 1.0)
             val max = Math.abs(min + Math.abs( r.nextInt() * 1.0))

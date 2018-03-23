@@ -23,4 +23,3 @@ class MinibusArrivalTerminalOne(private val minibus: Minibus, time: Double) : Ac
     override fun toString() = "Minibus ${minibus.id} ${super.toString()}"
 
 }
-
