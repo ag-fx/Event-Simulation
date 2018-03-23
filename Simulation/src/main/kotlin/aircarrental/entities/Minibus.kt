@@ -17,8 +17,6 @@ data class Minibus(
     var distanceToDestination: Double
 ) {
 
-    fun timeToDestination() = source.distanceToNext() / averageSpeed
-
     fun enter(customer: Customer) {
         seats.push(customer)
         if (seats.size() > capacity)

@@ -55,7 +55,6 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         while (shouldSimulate()) {
 
             if (isSimulationRunning()) {
-                val tl = timeline
 
                 val currentEvent = timeline.poll()
                 currentTime = currentEvent.occurrenceTime

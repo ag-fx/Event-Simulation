@@ -1,13 +1,10 @@
 package aircarrental.entities
 
 import aircarrental.AirCarRentalState
-import aircarrental.entities.Customer
 import core.StatisticQueue
 import core.StatisticalPriorityQueue
 
-
 enum class Buildings { TerminalOne, TerminalTwo, AirCarRental }
-
 
 data class Terminal(
     var arrivals: Int = 0,
