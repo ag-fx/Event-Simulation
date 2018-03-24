@@ -2,7 +2,7 @@ import XRandom.ExponentialRandom
 import java.io.File
 
 fun main(args: Array<String>) {
-    val prand = ExponentialRandom(1/10.0)
+    val prand = ExponentialRandom(1/10.0,6L)
     File("testData").mkdir()
     val f = File("testData/ExponentialRandom.txt")
     f.delete()

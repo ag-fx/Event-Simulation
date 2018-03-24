@@ -7,10 +7,10 @@ class MinibusArrivalTerminalTwo(private val minibus: Minibus, time: Double) : Ac
     override fun execute() = with(core) {
 
         if (terminalTwo.queue.isNotEmpty() && minibus.isNotFull())
-            plan(EnterToMinibus(
+            plan(StartLoading(
                 minibus = minibus,
                 terminal = terminalTwo,
-                time = currentTime + rndTimeToEnterBus.next()
+                time = currentTime
             ))
         else
             plan(MinibusGoTo(

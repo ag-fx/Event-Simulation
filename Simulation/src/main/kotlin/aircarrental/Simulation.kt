@@ -10,7 +10,7 @@ import aircarrental.event.TerminalTwoCustomerArrival
 import core.Event
 import core.SimCore
 import core.StatisticQueue
-import core.StatisticalPriorityQueue
+import core.StatisticPriorityQueue
 
 
 class AirCarRentalSimulation(
@@ -33,37 +33,32 @@ class AirCarRentalSimulation(
 
     val terminalOne = Terminal(
         description = Buildings.TerminalOne,
+        busCount = 0,
         queue = StatisticQueue(this)
     )
 
     val terminalTwo = Terminal(
         description = Buildings.TerminalTwo,
+        busCount = 0,
         queue = StatisticQueue(this)
     )
 
     val carRental = CarRental(
         description = Buildings.AirCarRental,
-        queue = StatisticalPriorityQueue(this),
+        queue = StatisticPriorityQueue(this),
         employees = List(conf.numberOfEmployees) { Employee() }
     )
     //endregion
 
     //region generators
-    /*
-     * Prúd zákazníkov prilietajúcich na terminál 1 je poissonovský prúd s intenzitou z1 = 43 zákazníkov za hodinu.
-     *  43/60      43 za hodinu
-     *  43/(60*60) 43 za sekundu
-     */
-    val rndArrivalTerminalOne = ExponentialRandom(43.0 / (60.0 * 60.0), rndSeed.nextLong())
 
-    /**
-     * same as [rndArrivalTerminalOne] but with 19
-     *
-     */
-    val rndArrivalTerminalTwo = ExponentialRandom(19.0 / (60.0 * 60.0), rndSeed.nextLong())
+    // Prúd zákazníkov prilietajúcich na terminál 1 je poissonovský prúd s intenzitou z1 = 43 zákazníkov za hodinu.
+    val rndArrivalTerminalOne = ExponentialRandom((60.0 * 60.0) / 43.0, rndSeed.nextLong())
+
+    // Prúd zákazníkov prilietajúcich na terminál 2 je poissonovský prúd s intenzitou z1 = 19 zákazníkov za hodinu.
+    val rndArrivalTerminalTwo = ExponentialRandom((60.0 * 60.0) / 19.0, rndSeed.nextLong())
 
     // Časová náročnosť základných operácií, ktoré je potrebné modelovať pomocou spojitého rovnomerného rozdelenia
-
     // Čas potrebný na obslúženie jedného zákazníka (zapožičanie vozidla): o = 6min ± 4min
     val rndTimeToOneCustomerService = RandomRange(
         min = (6.0 - 4.0) * 60.0,
@@ -106,8 +101,8 @@ class AirCarRentalSimulation(
             ))
         }
 
-        val terminalOneArrival = TerminalOneCustomerArrival(currentTime + rndArrivalTerminalOne.next())
-        val terminalTwoArrival = TerminalTwoCustomerArrival(currentTime + rndArrivalTerminalTwo.next())
+        val terminalOneArrival = TerminalOneCustomerArrival(currentTime)// + rndArrivalTerminalOne.next())
+        val terminalTwoArrival = TerminalTwoCustomerArrival(currentTime)// + rndArrivalTerminalTwo.next())
         plan(terminalOneArrival)
         plan(terminalTwoArrival)
 
@@ -137,8 +132,8 @@ class AirCarRentalSimulation(
             it.leftAt = 0.0
             it.seats.clear()
         }
-        totalCustomersTime = 0.0
-        numberOfServedCustomers = 0.0
+       totalCustomersTime = 0.0
+       numberOfServedCustomers = 0.0
     }
 
 

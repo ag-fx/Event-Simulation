@@ -2,19 +2,20 @@ package aircarrental.entities
 
 import aircarrental.AirCarRentalState
 import core.StatisticQueue
-import core.StatisticalPriorityQueue
+import core.StatisticPriorityQueue
 
 enum class Buildings { TerminalOne, TerminalTwo, AirCarRental }
 
 data class Terminal(
     var arrivals: Int = 0,
+    var busCount: Int,
     val description: Buildings,
     val queue: StatisticQueue<Customer, AirCarRentalState>
 )
 
 data class CarRental(
     val description: Buildings,
-    val queue: StatisticalPriorityQueue<Customer, AirCarRentalState>,
+    val queue: StatisticPriorityQueue<Customer, AirCarRentalState>,
     val employees: List<Employee>
 )
 

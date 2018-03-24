@@ -9,7 +9,7 @@ import core.StatisticQueue
 data class Minibus(
     val id: Int,
     val capacity: Int = 12,
-    val averageSpeed: Double = 35000.0 / 3600.0, //  Priemerná rýchlosť pohybu minibusu je 35 km/h.  = 35* 60*60/1000
+    val averageSpeed: Double = 35000.0 / 3600.0,
     val seats: StatisticQueue<Customer, AirCarRentalState>,
     var destination: Buildings,
     var source: Buildings,

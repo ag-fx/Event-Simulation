@@ -11,7 +11,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     val currentReplicationChannel = Channel<S>()
     val afterReplicationChannel = Channel<List<S>>()
 
-    private val timeline = PriorityQueue<Event>()
+    private val timeline = PriorityBlockingQueue<Event>()
     private val replicationStates = mutableListOf<S>()
     private val oneSecond = 1.0
     private var runs = 0
@@ -112,7 +112,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     protected abstract fun beforeSimulation()
     protected abstract fun toState(run: Int, simTime: Double): S
-    protected val rndSeed = Random(666666L)
+    protected val rndSeed = Random()
 
     fun log(s: Any) {
         if (log)

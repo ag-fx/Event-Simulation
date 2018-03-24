@@ -9,7 +9,7 @@ class RandomRangeTes : StringSpec() {
 
         val r = Random()
         "random test "{
-            val x = ExponentialRandom(43.0 / (60.0 * 60.0))
+            val x = ExponentialRandom(43.0 / (60.0 * 60.0),6)
             repeat(500){
                 println(x.next())
             }

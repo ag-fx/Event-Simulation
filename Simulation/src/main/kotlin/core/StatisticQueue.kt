@@ -6,7 +6,7 @@ interface Statistical {
     var arrivedToSystem: Double
 }
 
-class  StatisticalPriorityQueue<T : Statistical, S : State>(private val simCore: SimCore<S>) {
+class  StatisticPriorityQueue<T : Statistical, S : State>(private val simCore: SimCore<S>) {
 
     private val queue           = PriorityQueue<T>()
     private var lastChange      = 0.0

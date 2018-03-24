@@ -9,10 +9,10 @@ class MinibusArrivalTerminalOne(private val minibus: Minibus, time: Double) : Ac
         if (minibus.isNotEmpty()) throw IllegalStateException("Minibus has to arrive empty to Terminal 1")
 
         if (terminalOne.queue.isNotEmpty())
-            plan(EnterToMinibus(
+            plan(StartLoading(
                 minibus = minibus,
                 terminal = terminalOne,
-                time = currentTime + rndTimeToEnterBus.next()
+                time = currentTime
             ))
         else
             plan(MinibusGoTo(
