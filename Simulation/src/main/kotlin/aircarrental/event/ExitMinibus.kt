@@ -8,7 +8,7 @@ class ExitMinibus(
 ) : AcrEvent(time) {
 
     override fun execute() = with(core) {
-
+  //TODO nemal by som hadzat zakaznika do rady ak sa ide rovno obsluzit, bude to kazit vysledky
         val exitingCustomer = minibus.seats.pop()
         carRental.queue.push(exitingCustomer)
 

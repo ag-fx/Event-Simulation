@@ -22,7 +22,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     var currentTime = 0.0
         private set(value) {
-            field = if (value < field && value != 0.0) throw IllegalStateException("Time travel") else value
+            field = if (value < field && value != 0.0) throw IllegalArgumentException("Time travel") else value
         }
 
     open var speed = oneSecond //* 60
@@ -68,7 +68,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
 
             } else {
-                delay(250)
+                Thread.sleep(250)
             }
 
             if (stop) {
@@ -78,10 +78,6 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
             }
 
         }
-    }
-
-    private suspend fun executeEvent() {
-
     }
 
     private val tick = Tick<S>(currentTime + speed)
@@ -94,9 +90,9 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     open fun plan(event: Event) {
         if (event.occurrenceTime >= currentTime)
-            timeline.add(event.also { log("Planning $it") })
+            timeline.add(event)
         else
-            throw IllegalStateException("Time travel")
+            throw IllegalArgumentException("Event is occurring in the past")
     }
 
     private fun isSimulationRunning() = isRunning && !stop
@@ -108,17 +104,18 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     }
 
     protected abstract fun beforeReplication()
-    protected open fun afterSimulation() {
+
+      protected open fun afterSimulation() {
         afterReplicationChannel.close()
         currentReplicationChannel.close()
     }
 
     protected abstract fun beforeSimulation()
     protected abstract fun toState(run: Int, simTime: Double): S
-    protected val rndSeed = Random()
+    protected val rndSeed = Random(666666L)
 
     fun log(s: Any) {
-        if (log && !s.toString().contains("Planning Terminal") && !s.toString().contains("TerminalOneCustomerArrival")&& !s.toString().contains("TerminalTwoCustomerArrival"))
+        if (log)
             println(s)
     }
 

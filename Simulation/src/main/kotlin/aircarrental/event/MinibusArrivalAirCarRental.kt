@@ -5,6 +5,7 @@ import aircarrental.entities.*
 class MinibusArrivalAirCarRental(private val minibus: Minibus, time: Double) : AcrEvent(time) {
 
     override fun execute() = with(core) {
+
         if (minibus.isNotEmpty())
             plan(ExitMinibus(
                 minibus = minibus,

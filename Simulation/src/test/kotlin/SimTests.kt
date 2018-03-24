@@ -23,7 +23,7 @@ fun main(args: Array<String>) = runBlocking {
     )
     val repcount = 500
     configurations.forEach { configuration ->
-        val sim = AirCarRentalSimulation(configuration.first, 60 * 60.0 * 24 * 30, repcount)
+        val sim = AirCarRentalSimulation(configuration.first, 60 * 60.0 , repcount)
         sim.speed = 1200.0
         sim.stopWatching()
         sim.log = false
