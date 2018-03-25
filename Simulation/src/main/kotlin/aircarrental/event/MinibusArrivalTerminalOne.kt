@@ -6,8 +6,6 @@ class MinibusArrivalTerminalOne(private val minibus: Minibus, time: Double) : Ac
 
     override fun execute() = with(core) {
 
-        if (minibus.isNotEmpty()) throw IllegalStateException("Minibus has to arrive empty to Terminal 1")
-
         if (terminalOne.queue.isNotEmpty())
             plan(StartLoading(
                 minibus = minibus,
