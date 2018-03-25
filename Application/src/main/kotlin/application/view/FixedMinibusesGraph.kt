@@ -1,17 +1,24 @@
 package application.view
 
-import application.controller.FixedEmployeeController
-import com.sun.jmx.remote.util.EnvHelp
+import application.controller.FixedMinibusController
 import javafx.scene.chart.NumberAxis
 import tornadofx.*
 
 class FixedMinibusesView : View("Závislosť na počte mikrobusov") {
 
-    val controller : FixedEmployeeController by inject()
+    val controller: FixedMinibusController by inject()
     private val x = NumberAxis()
     private val y = NumberAxis()
     val graphName = "Závislosť priemerného času stráveného zákazníkom\nna zapožičanie vozidla na počte mikrobusov."
-    override val root = linechart<Number,Number>(graphName,x,y){
-        series("Poc",controller.data)
+    override val root = vbox {
+        hbox {
+            spacer()
+            button("Start") { action { controller.start() } }
+            spacer()
+        }
+        linechart<Number, Number>(graphName, x, y) {
+            series("Poc", controller.data)
+            createSymbols = false
+        }
     }
 }

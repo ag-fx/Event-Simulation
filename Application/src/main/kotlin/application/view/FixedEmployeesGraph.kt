@@ -11,12 +11,14 @@ class FixedEmployeeView : View("Závislosť na počte pracovníkov") {
     private val x = NumberAxis()
     private val y = NumberAxis()
     private val controller: FixedEmployeeController by inject()
-
-    override val root = vbox{
-        spacer()
-        button("Start"){action { controller.start() }}
-        spacer()
-        linechart<Number,Number>("Závislosť priemerného času stráveného zákazníkom\nna zapožičanie vozidla na počte pracovníkov ",x,y)
+    val graphName = "Závislosť priemerného času stráveného zákazníkom\nna zapožičanie vozidla na počte pracovníkov"
+    override val root = vbox {
+        hbox {
+            spacer()
+            button("Start") { action { controller.start() } }
+            spacer()
+        }
+        linechart<Number, Number>(graphName, x, y)
     }
 
 }

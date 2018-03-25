@@ -12,8 +12,8 @@ import coroutines.JavaFx as onUi
 class MyController : Controller() {
 
     private val testSim = AirCarRentalSimulation(
-        conf = AirCarConfig(numberOfEmployees = 8, numberOfMinibuses = 5),
-        maxSimTime = 60.0 * 60.0 * 24.0 * 30,
+        conf = AirCarConfig(numberOfEmployees = 20, numberOfMinibuses = 5),
+        maxSimTime = 60.0 * 60.0 * 24.0 * 10,
         numberOfReplication = 100)
 
     val textProperty = SimpleStringProperty("1")
