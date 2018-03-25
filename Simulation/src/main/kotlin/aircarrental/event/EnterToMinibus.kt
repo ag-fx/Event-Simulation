@@ -1,7 +1,9 @@
 package aircarrental.event
 
-import aircarrental.entities.*
-import java.util.*
+import aircarrental.entities.Customer
+import aircarrental.entities.Minibus
+import aircarrental.entities.Terminal
+import aircarrental.entities.nextStop
 
 class EnterToMinibus(
     val minibus: Minibus,
@@ -29,18 +31,8 @@ class EnterToMinibus(
                 time = currentTime
             ))
 
-
     }
 
     override fun toString() = "Entering minibus ${minibus.id} at ${terminal.description} ${super.toString()}"
-
-}
-
-fun main(args: Array<String>) {
-    val r = Random(6L)
-    for (i in 0..5) {
-        println(r.nextDouble())
-        Thread.sleep(100)
-    }
 
 }

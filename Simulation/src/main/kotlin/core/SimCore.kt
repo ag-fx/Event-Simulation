@@ -1,5 +1,6 @@
 package core
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import kotlinx.coroutines.experimental.channels.Channel
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
@@ -38,9 +39,11 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         beforeSimulation()
         repeat(replications) {
             beforeReplication()
+
             simulate()
+            coolDown()
             afterReplication()
-            replicationStates += toState(runs, currentTime)
+            replicationStates += toState(it, currentTime)
             if (!stop)
                 afterReplicationChannel.send(replicationStates)
         }
@@ -80,6 +83,26 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         }
     }
 
+    private suspend fun coolDown() {
+        while (timeline.isNotEmpty()) {
+            val currentEvent = timeline.poll()
+
+            if(timeline.size == 0 && currentEvent == tick) break
+
+            if (coolDownEventFilter(currentEvent)) {
+                currentTime = currentEvent.occurrenceTime
+                log("Cooling down : $currentEvent")
+                currentEvent.execute()
+                if (isWatched()) {
+                    val state = toState(runs++, currentTime)
+                    currentReplicationChannel.send(state)
+                }
+            }
+        }
+    }
+
+    protected abstract fun coolDownEventFilter(event: Event): Boolean
+
     private val tick = Tick<S>(currentTime + speed)
 
     fun planTick() {
@@ -100,18 +123,18 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     private fun shouldSimulate() = currentTime < maxSimTime && timeline.isNotEmpty()
 
     protected open fun afterReplication() {
-        //TODO osterit posledne eventy v kalendari
+
     }
 
     protected abstract fun beforeReplication()
 
-      protected open fun afterSimulation() {
+    protected open fun afterSimulation() {
         afterReplicationChannel.close()
         currentReplicationChannel.close()
     }
 
     protected abstract fun beforeSimulation()
-    protected abstract fun toState(run: Int, simTime: Double): S
+    protected abstract fun toState(replication: Int, simTime: Double): S
     protected val rndSeed = Random()
 
     fun log(s: Any) {

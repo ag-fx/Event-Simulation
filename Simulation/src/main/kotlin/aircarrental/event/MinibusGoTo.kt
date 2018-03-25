@@ -3,9 +3,9 @@ package aircarrental.event
 import aircarrental.entities.*
 
 class MinibusGoTo(
-    private val minibus: Minibus,
-    private val destination: Buildings,
-    private val source: Buildings,
+    val minibus: Minibus,
+    val destination: Buildings,
+     val source: Buildings,
     time: Double
 ) : AcrEvent(time) {
 

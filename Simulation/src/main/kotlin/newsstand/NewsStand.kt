@@ -1,8 +1,9 @@
-package TestSim.Newsstand
+package newsstand
 
 import core.*
 import XRandom.ExponentialRandom
-@Deprecated("Wrong state")
+
+@Deprecated("Wrong Customer")
 data class Customer(override var arrivedToSystem: Double = 0.0) : Statistical
 
 @Deprecated("Wrong state")
@@ -15,8 +16,11 @@ data class NewsStandState(
         override val stopped: Boolean
 ) : State
 
-@Deprecated("Wrong state")
+@Deprecated("Wrong simulation")
 class NewsstandSimulation : SimCore<NewsStandState>(maxSimTime = 10_000_000.0, replications = 100) {
+
+
+    override fun coolDownEventFilter(event: Event) = true
 
     override fun afterSimulation() {
 
@@ -46,13 +50,13 @@ class NewsstandSimulation : SimCore<NewsStandState>(maxSimTime = 10_000_000.0, r
         super.plan(newsEvent)
     }
 
-    override fun toState(run: Int, simTime: Double) = NewsStandState(
-            avgWaitTime = queue.averageWaitTime(),
-            running = true,
-            avgQueueSize = queue.averageSize(),
-            currentTime = currentTime,
-            run = run,
-            stopped = stop
+    override fun toState(replication: Int, simTime: Double) = NewsStandState(
+        avgWaitTime = queue.averageWaitTime(),
+        running = true,
+        avgQueueSize = queue.averageSize(),
+        currentTime = currentTime,
+        run = replication,
+        stopped = stop
     )
 
 }

@@ -1,7 +1,8 @@
-package TestSim.Newsstand
+package newsstand
 
 import core.Event
 
+@Deprecated("Test event")
 abstract class NewsstandEvent(time: Double) : Event(time) {
     lateinit var core: NewsstandSimulation
 }

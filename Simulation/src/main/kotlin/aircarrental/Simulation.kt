@@ -3,10 +3,7 @@ package aircarrental
 import XRandom.ExponentialRandom
 import XRandom.RandomRange
 import aircarrental.entities.*
-import aircarrental.event.AcrEvent
-import aircarrental.event.MinibusGoTo
-import aircarrental.event.TerminalOneCustomerArrival
-import aircarrental.event.TerminalTwoCustomerArrival
+import aircarrental.event.*
 import core.Event
 import core.SimCore
 import core.StatisticQueue
@@ -108,8 +105,11 @@ class AirCarRentalSimulation(
 
     }
 
-    override fun afterSimulation() {
-        super.afterSimulation()
+    override fun coolDownEventFilter(event: Event) = when (event) {
+        is TerminalOneCustomerArrival -> false
+        is TerminalTwoCustomerArrival -> false
+        is MinibusGoTo -> terminalOne.queue.isNotEmpty() || terminalTwo.queue.isNotEmpty() || event.minibus.isNotEmpty()
+        else -> true
     }
 
     override fun beforeSimulation() {
@@ -132,12 +132,12 @@ class AirCarRentalSimulation(
             it.leftAt = 0.0
             it.seats.clear()
         }
-       totalCustomersTime = 0.0
-       numberOfServedCustomers = 0.0
+        totalCustomersTime = 0.0
+        numberOfServedCustomers = 0.0
     }
 
 
-    override fun toState(run: Int, simTime: Double) = AirCarRentalState(
+    override fun toState(replication: Int, simTime: Double) = AirCarRentalState(
         avgQueueWaitTimeTerminalOne = terminalOne.queue.averageWaitTime(),
         avgQueueWaitTimeTerminalTwo = terminalTwo.queue.averageWaitTime(),
         avgQueueSizeTerminalOne = terminalOne.queue.averageSize(),
@@ -151,7 +151,7 @@ class AirCarRentalSimulation(
         currentTime = simTime,
         totalTerminal1 = terminalOne.arrivals,
         totalTerminal2 = terminalTwo.arrivals,
-        run = run
+        run = replication
     )
 }
 

@@ -9,8 +9,9 @@ fun main(args: Array<String>) = runBlocking {
     val repcount = 100
 //    val configuration = AirCarConfig(numberOfEmployees = 20, numberOfMinibuses = 5) to 20.1
     val configuration = AirCarConfig(numberOfEmployees = 20, numberOfMinibuses = 5) to 16595.1310
-    val sim = AirCarRentalSimulation(configuration.first, 60.0 * 60 * 24 * 30, repcount)
-    sim.speed = 1200.0
+    val sim = AirCarRentalSimulation(configuration.first, 60.0 * 60 * 24, repcount)
+    sim.speed = 20.0
+    sim.sleepTime = 1
     sim.log = true
     sim.start()
 
