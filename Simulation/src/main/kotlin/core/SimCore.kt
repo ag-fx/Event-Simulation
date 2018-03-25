@@ -39,7 +39,6 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         beforeSimulation()
         repeat(replications) {
             beforeReplication()
-
             simulate()
             coolDown()
             afterReplication()
