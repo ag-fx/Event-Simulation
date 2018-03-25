@@ -19,6 +19,7 @@ data class NewsStandState(
 @Deprecated("Wrong simulation")
 class NewsstandSimulation : SimCore<NewsStandState>(maxSimTime = 10_000_000.0, replications = 100) {
 
+    override fun warmupTime() = 0.0
 
     override fun coolDownEventFilter(event: Event) = true
 

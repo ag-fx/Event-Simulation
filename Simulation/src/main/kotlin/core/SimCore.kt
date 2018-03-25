@@ -1,5 +1,6 @@
 package core
 
+import com.sun.org.apache.xml.internal.security.Init
 import com.sun.org.apache.xpath.internal.operations.Bool
 import kotlinx.coroutines.experimental.channels.Channel
 import kotlinx.coroutines.experimental.delay
@@ -18,17 +19,20 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     private var runs = 0
     private var isWatched = true
     var log = true
-
     var sleepTime = 1000L
+    open var speed = oneSecond //* 60
+    protected var isRunning = true
+    protected var state = SimulationState.Init
+
+    abstract fun warmupTime(): Double
 
     var currentTime = 0.0
         private set(value) {
-            field = if (value < field && value != 0.0) throw IllegalArgumentException("Time travel") else value
+            field =
+                if (value < field && value != 0.0)
+                    throw IllegalArgumentException("Time travel")
+                else value
         }
-
-    open var speed = oneSecond //* 60
-
-    protected var isRunning = true
 
     var stop = false
         private set(value) {
@@ -37,12 +41,14 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     fun start() = launch {
         beforeSimulation()
+        state = SimulationState.WarmingUp
         repeat(replications) {
             beforeReplication()
             simulate()
             coolDown()
             afterReplication()
-            replicationStates += toState(it, currentTime)
+            if (state.isValid())
+                replicationStates += toState(it, currentTime)
             if (!stop)
                 afterReplicationChannel.send(replicationStates)
         }
@@ -51,7 +57,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     }
 
     private suspend fun simulate() {
-        if (isWatched())
+        if (isWatched() && state.isValid())
             planTick()
 
         while (shouldSimulate()) {
@@ -63,11 +69,10 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
                 log(currentEvent)
                 currentEvent.execute()
 
-                if (isWatched()) {
+                if (isWatched() && state.isValid()) {
                     val state = toState(runs++, currentTime)
                     currentReplicationChannel.send(state)
                 }
-
 
             } else {
                 Thread.sleep(250)
@@ -83,10 +88,11 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     }
 
     private suspend fun coolDown() {
+        state = SimulationState.CoolingDown
         while (timeline.isNotEmpty()) {
             val currentEvent = timeline.poll()
 
-            if(timeline.size == 0 && currentEvent == tick) break
+            if (timeline.size == 0 && currentEvent == tick) break
 
             if (coolDownEventFilter(currentEvent)) {
                 currentTime = currentEvent.occurrenceTime
@@ -100,6 +106,13 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         }
     }
 
+    /**
+     * Filter for events that should be executed. I recommend to filter self calling events which create
+     * new entities in system. ie. customer arrivals.
+     *
+     * @param event event that is about to be executed after time was exceeded and timiline was not empty
+     * @return True if event should be executed in cooldown
+     */
     protected abstract fun coolDownEventFilter(event: Event): Boolean
 
     private val tick = Tick<S>(currentTime + speed)
@@ -110,16 +123,16 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         timeline.add(tick)
     }
 
+    /**
+     * Always call super
+     */
     open fun plan(event: Event) {
+        //Always cast event to your event and assign a core to it.
         if (event.occurrenceTime >= currentTime)
             timeline.add(event)
         else
             throw IllegalArgumentException("Event is occurring in the past")
     }
-
-    private fun isSimulationRunning() = isRunning && !stop
-
-    private fun shouldSimulate() = currentTime < maxSimTime && timeline.isNotEmpty()
 
     protected open fun afterReplication() {
 
@@ -127,25 +140,30 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     protected abstract fun beforeReplication()
 
+
+    /**
+     * Always call super when overriding
+     */
     protected open fun afterSimulation() {
         afterReplicationChannel.close()
         currentReplicationChannel.close()
     }
 
     protected abstract fun beforeSimulation()
+
     protected abstract fun toState(replication: Int, simTime: Double): S
+
     protected val rndSeed = Random()
 
-    fun log(s: Any) {
-        if (log)
-            println(s)
-    }
-
+    /**
+     * Always call super when overriding
+     */
     open fun clear() {
         currentTime = 0.0
         runs = 0
         isRunning = true
         stop = false
+        state = SimulationState.Init
         timeline.clear()
     }
 
@@ -170,6 +188,15 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     fun stopWatching() {
         isWatched = false
+    }
+
+    private fun isSimulationRunning() = isRunning && !stop
+
+    private fun shouldSimulate() = (currentTime < (maxSimTime + warmupTime())) && timeline.isNotEmpty()
+
+    fun log(s: Any) {
+        if (log)
+            println(s)
     }
 
 }

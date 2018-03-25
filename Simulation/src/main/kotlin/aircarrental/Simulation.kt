@@ -4,10 +4,7 @@ import XRandom.ExponentialRandom
 import XRandom.RandomRange
 import aircarrental.entities.*
 import aircarrental.event.*
-import core.Event
-import core.SimCore
-import core.StatisticQueue
-import core.StatisticPriorityQueue
+import core.*
 
 
 class AirCarRentalSimulation(
@@ -15,6 +12,8 @@ class AirCarRentalSimulation(
     maxSimTime: Double,
     numberOfReplication: Int
 ) : SimCore<AirCarRentalState>(maxSimTime, numberOfReplication) {
+
+    override fun warmupTime() = maxSimTime * 0.15
 
     //region entities
     private val minibuses = List(conf.numberOfMinibuses) {
@@ -84,6 +83,9 @@ class AirCarRentalSimulation(
 
     override fun plan(event: Event) {
         val simEvent = (event as AcrEvent).apply { core = this@AirCarRentalSimulation }
+        if(currentTime > warmupTime())
+            state = SimulationState.WarmedUp
+
         super.plan(simEvent)
     }
 

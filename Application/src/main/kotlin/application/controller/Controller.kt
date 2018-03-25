@@ -28,7 +28,7 @@ class MyController : Controller() {
 
     fun run() {
         testSim.log = false
-        testSim.stopWatching()
+       // testSim.stopWatching()
 //        AirCarConfig(numberOfEmployees = 1, numberOfMinibuses = 1) to 16595.1310
 //        val sim = AirCarRentalSimulation(configuration.first, 60 * 60.0 * 24 * 30 , repcount)
         launch(onUi) {
