@@ -1,39 +1,18 @@
-
 package application.view
 
-import application.controller.MyController
+import javafx.scene.control.TabPane
 import tornadofx.*
+
 class MainView : View("Hello TornadoFX") {
 
-    private val myController: MyController by inject()
 
-    override val root = vbox {
-        prefWidth = 600.0
-
-        hbox {
-            label("Replication")
-            spacer()
-            label(myController.simTimeProperty)
-            spacer()
-            textfield(myController.textProperty)
-        }
-        hbox {
-            label("Simulation")
-            spacer()
-            textfield(myController.simTextProperty)
-        }
-        myController.run()
-        textfield { text = "live ui :)" }
-        button("Speed up") { action { myController.speedUp() } }
-        button("Pause") { action { myController.pause() } }
-        button("Resume") { action { myController.resume() } }
-        button("Stop watching  ") { action { myController.stopWatching() } }
-        button("Start watching ") { action { myController.startWatching() } }
+    override val root = tabpane {
+        tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
+        tab(TestView::class)
+        tab(FixedMinibusesView::class)
+        tab(FixedEmployeeView::class)
+        tab(ReplicationView::class)
+        tab(SimulationView::class)
     }
-}
-
-fun main(args: Array<String>) {
-    val nejakyString = "ahoj"
-
 
 }

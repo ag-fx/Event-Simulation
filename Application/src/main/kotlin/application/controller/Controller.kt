@@ -2,8 +2,8 @@ package application.controller
 
 import aircarrental.AirCarConfig
 import aircarrental.AirCarRentalSimulation
+import application.model.AirCarRentalStateModel
 import javafx.beans.property.SimpleStringProperty
-import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.channels.consumeEach
 import kotlinx.coroutines.experimental.launch
 import tornadofx.*
@@ -25,6 +25,8 @@ class MyController : Controller() {
     val simTimeProperty = SimpleStringProperty("")
     private var simTime by simTimeProperty
 
+    val currentReplicationState = mutableListOf<AirCarRentalStateModel>().observable()
+    val replications = mutableListOf<AirCarRentalStateModel>().observable()
 
     fun run() {
         testSim.log = false
@@ -34,7 +36,8 @@ class MyController : Controller() {
         launch(onUi) {
             testSim.currentReplicationChannel
                 .consumeEach {
-                    text = "${it.customersTimeInSystem.div(60).also { println(it) }}"
+                    currentReplicationState.add(0,AirCarRentalStateModel(it))
+                    text = "${it.customersTimeInSystem.div(60)}"
                     simTime = "${it.currentTime}"
                 }
 
@@ -43,6 +46,8 @@ class MyController : Controller() {
         launch(onUi) {
             testSim.afterReplicationChannel
                 .consumeEach {
+                    currentReplicationState.clear()
+                    replications.add(0,AirCarRentalStateModel(it.last()))
                     simText = "${it.map { it.customersTimeInSystem / 60 }.average()}"
                 }
         }

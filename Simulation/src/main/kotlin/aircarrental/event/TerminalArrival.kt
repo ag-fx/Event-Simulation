@@ -13,7 +13,6 @@ class TerminalOneCustomerArrival(time: Double) : AcrEvent(time) {
         ))
         occurrenceTime = currentTime + rndArrivalTerminalOne.next()
         plan(this@TerminalOneCustomerArrival)
-//        log("Terminal 1 = ${terminalOne.queue.size()}")
     }
 
 }
@@ -29,7 +28,6 @@ class TerminalTwoCustomerArrival(time: Double) : AcrEvent(time) {
 
         occurrenceTime = currentTime + rndArrivalTerminalTwo.next()
         plan(this@TerminalTwoCustomerArrival)
-//        log("Terminal 2 = ${terminalTwo.queue.size()}")
 
     }
 

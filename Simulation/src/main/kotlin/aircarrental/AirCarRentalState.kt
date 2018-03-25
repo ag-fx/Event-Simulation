@@ -17,8 +17,12 @@ data class AirCarRentalState(
     override val currentTime: Double,
     override val run: Int,
     val numberOfServedCustomers: Double,
-    val totalCustomersTime: Double
+    val totalCustomersTime: Double,
+    val config : AirCarConfig
 ) : State
+
+
+
 
 data class AirCarConfig(
         val numberOfMinibuses: Int,

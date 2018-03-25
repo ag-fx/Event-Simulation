@@ -5,22 +5,21 @@ import XRandom.RandomRange
 import aircarrental.entities.*
 import aircarrental.event.*
 import core.*
+import java.util.*
 
 
 class AirCarRentalSimulation(
-    conf: AirCarConfig,
-    maxSimTime: Double,
-    numberOfReplication: Int
+    val conf: AirCarConfig,
+    maxSimTime: Double = 60*60*24*30.0,
+    numberOfReplication: Int = 100
 ) : SimCore<AirCarRentalState>(maxSimTime, numberOfReplication) {
-
-    override fun warmupTime() = maxSimTime * 0.15
 
     //region entities
     private val minibuses = List(conf.numberOfMinibuses) {
         Minibus(
             id = it + 1,
-            destination = Buildings.TerminalOne,
             source = Buildings.AirCarRental,
+            destination = Buildings.TerminalTwo,
             distanceToDestination = Buildings.AirCarRental.distanceToNext(),
             leftAt = 0.0,
             seats = StatisticQueue(this@AirCarRentalSimulation)
@@ -75,6 +74,14 @@ class AirCarRentalSimulation(
         max = (8.0 + 4.0),
         rndSeedNumber = rndSeed.nextLong()
     )
+
+    private val rndSource = Random(rndSeed.nextLong())
+
+    private val rndLeftAt = RandomRange(
+        min = 0.0,
+        max = Buildings.values().map { it.distanceToNext() }.sum() / minibuses.first().averageSpeed,
+        rndSeedNumber = rndSeed.nextLong()
+    )
     //endregion
 
     override var speed = 1.0
@@ -83,9 +90,6 @@ class AirCarRentalSimulation(
 
     override fun plan(event: Event) {
         val simEvent = (event as AcrEvent).apply { core = this@AirCarRentalSimulation }
-        if(currentTime > warmupTime())
-            state = SimulationState.WarmedUp
-
         super.plan(simEvent)
     }
 
@@ -93,18 +97,16 @@ class AirCarRentalSimulation(
         clear()
         minibuses.forEach {
             plan(MinibusGoTo(
-                source = Buildings.AirCarRental,
-                destination = Buildings.TerminalOne,
+                source = it.source,
+                destination = it.destination,
                 minibus = it,
-                time = currentTime
+                time = it.leftAt
             ))
         }
-
-        val terminalOneArrival = TerminalOneCustomerArrival(currentTime)// + rndArrivalTerminalOne.next())
-        val terminalTwoArrival = TerminalTwoCustomerArrival(currentTime)// + rndArrivalTerminalTwo.next())
+        val terminalOneArrival = TerminalOneCustomerArrival(currentTime + rndArrivalTerminalOne.next())
+        val terminalTwoArrival = TerminalTwoCustomerArrival(currentTime + rndArrivalTerminalTwo.next())
         plan(terminalOneArrival)
         plan(terminalTwoArrival)
-
     }
 
     override fun coolDownEventFilter(event: Event) = when (event) {
@@ -128,10 +130,12 @@ class AirCarRentalSimulation(
         terminalTwo.arrivals = 0
         carRental.queue.clear()
         carRental.employees.forEach { it.isBusy = false }
+
         minibuses.forEach {
-            it.destination = Buildings.TerminalOne
-            it.source = Buildings.AirCarRental
-            it.leftAt = 0.0
+            val source = Buildings.values()[rndSource.nextInt(Buildings.values().size)]
+            it.source = source
+            it.destination = source.nextStop()
+            it.leftAt = rndLeftAt.next()
             it.seats.clear()
         }
         totalCustomersTime = 0.0
@@ -153,7 +157,7 @@ class AirCarRentalSimulation(
         currentTime = simTime,
         totalTerminal1 = terminalOne.arrivals,
         totalTerminal2 = terminalTwo.arrivals,
-        run = replication
+        run = replication,
+        config = conf
     )
 }
-
