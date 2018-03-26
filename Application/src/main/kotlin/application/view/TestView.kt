@@ -23,7 +23,6 @@ class TestView : View("TestView") {
         }
         textfield { text = "live ui :)" }
         hbox {
-            button("Speed up") { action { myController.speedUp() } }
             spacer()
             button("Pause") { action { myController.pause() } }
             spacer()

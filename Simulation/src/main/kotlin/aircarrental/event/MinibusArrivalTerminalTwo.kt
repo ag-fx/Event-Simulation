@@ -5,6 +5,7 @@ import aircarrental.entities.*
 class MinibusArrivalTerminalTwo(private val minibus: Minibus, time: Double) : AcrEvent(time) {
 
     override fun execute() = with(core) {
+        minibus.isInSource = true
 
         if (terminalTwo.queue.isNotEmpty() && minibus.isNotFull())
             plan(StartLoading(

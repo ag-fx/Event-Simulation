@@ -16,3 +16,5 @@ data class Customer(
     override fun toString() = "Customer $id from $terminal"
 
 }
+
+

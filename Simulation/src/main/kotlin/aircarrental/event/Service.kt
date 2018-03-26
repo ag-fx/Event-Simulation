@@ -8,8 +8,10 @@ class Service(
 ) : AcrEvent(time) {
 
     override fun execute() = with(core) {
-        plan(ServiceEnd(carRental.queue.pop(), employee, currentTime + rndTimeToOneCustomerService.next()))
+        val served = carRental.queue.pop()
+        plan(ServiceEnd(served, employee, currentTime + rndTimeToOneCustomerService.next()))
         employee.isBusy = true
+        employee.serving = served
     }
 
 }
@@ -22,6 +24,7 @@ class ServiceEnd(
 
     override fun execute() = with(core) {
         employee.isBusy = false
+        employee.serving = null
         totalCustomersTime += (currentTime - customer.arrivedToSystem)
         numberOfServedCustomers++
         if(carRental.queue.isNotEmpty())

@@ -2,7 +2,11 @@ package application.controller
 
 import aircarrental.AirCarConfig
 import aircarrental.AirCarRentalSimulation
-import application.model.AirCarRentalStateModel
+import aircarrental.entities.Minibus
+import application.model.*
+import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.channels.consumeEach
@@ -27,9 +31,28 @@ class MyController : Controller() {
     val simTimeProperty = SimpleStringProperty("")
     private var simTime by simTimeProperty
 
+    val currentReplicationProperty = SimpleIntegerProperty(0)
+    var currentReplication by currentReplicationProperty
+
+    val replicationPercentageProperty = SimpleDoubleProperty(0.0)
+    var replicationPercentage by replicationPercentageProperty
+
+    val speedProperty = SimpleDoubleProperty(500.0)
+    var speed by speedProperty
+
+    val currentRepProperty = SimpleObjectProperty<AirCarRentalStateModel>(initModel)
+    var currentRep by currentRepProperty
+
     val currentReplicationState = mutableListOf<AirCarRentalStateModel>().observable()
+
+    val terminal1ppl = mutableListOf<CustomerModel>().observable()
+    val terminal2ppl = mutableListOf<CustomerModel>().observable()
+    val aircarppl = mutableListOf<CustomerModel>().observable()
+    val minubuses = mutableListOf<MinibusModel>().observable()
+    val employees = mutableListOf<EmployeeModel>().observable()
+
     val replications = mutableListOf<AirCarRentalStateModel>().observable()
-    val thread = newSingleThreadContext("AirCarRentalSimulation")
+    private val thread = newSingleThreadContext("AirCarRentalSimulation")
 
     fun start() {
         testSim.log = false
@@ -37,9 +60,19 @@ class MyController : Controller() {
         launch(onUi) {
             testSim.currentReplicationChannel
                 .consumeEach {
+                    currentRep = AirCarRentalStateModel(it)
+                    currentReplication = it.replicationNumber
+                    replicationPercentage = it.replicationNumber / (testSim.numberOfReplication * 1.0)
                     currentReplicationState.add(0, AirCarRentalStateModel(it))
                     text = "${it.customersTimeInSystem.div(60)}"
                     simTime = "${it.currentTime}"
+                    terminal1ppl.setAll(it.terminal1Queue.map { CustomerModel(it) })
+                    terminal2ppl.setAll(it.terminal2Queue.map { CustomerModel(it) })
+                    aircarppl.setAll(it.carRentalQueue.map { CustomerModel(it) })
+                    employees.setAll(it.employees.map { EmployeeModel(it) })
+                    val sim = it
+                    minubuses.setAll(it.minibuses.map { MinibusModel(sim.currentTime, it) })
+
                 }
 
         }
@@ -47,6 +80,9 @@ class MyController : Controller() {
         launch(onUi) {
             testSim.afterReplicationChannel
                 .consumeEach {
+                    currentReplication = it.last().replicationNumber
+                    replicationPercentage = it.last().replicationNumber / (testSim.numberOfReplication * 1.0)
+
                     currentReplicationState.clear()
                     replications.add(0, AirCarRentalStateModel(it.last()))
                     simText = "${it.map { it.customersTimeInSystem / 60 }.average()}"
@@ -55,15 +91,6 @@ class MyController : Controller() {
 
         async(thread) { testSim.start() }
 
-    }
-
-
-    fun speedUp() {
-        testSim.speed *= 2
-    }
-
-    fun slowDown() {
-        testSim.speed /= 2
     }
 
     fun pause() {
@@ -80,6 +107,10 @@ class MyController : Controller() {
 
     fun stopWatching() {
         testSim.stopWatching()
+    }
+
+    fun updateSpeed() {
+        testSim.sleepTime = speed.toLong()
     }
 
 

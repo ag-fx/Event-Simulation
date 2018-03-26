@@ -1,14 +1,12 @@
 package application.model
 
-import kotlinx.coroutines.experimental.channels.produce
+import aircarrental.entities.Customer
 
-data class DataModel(val test: Int)
-
-class MyModel {
-    private var x = 0
-    val hello = produce {
-        while (true) send(x++)
-    }
-
+class CustomerModel(customer:Customer) : tornadofx.ItemViewModel<Customer>(customer) {
+    val id = bind(Customer::id)
+    val terminal = bind(Customer::terminal)
+    val rentCarWaitingTime = bind(Customer::rentCarWaitingTime)
+    val getOnBusTime = bind(Customer::getOnBusTime)
+    val getFromBusTime = bind(Customer::getFromBusTime)
+    val arrivedToSystem = bind(Customer::arrivedToSystem)
 }
-

@@ -6,18 +6,18 @@ interface Statistical {
     var arrivedToSystem: Double
 }
 
-class  StatisticPriorityQueue<T : Statistical, S : State>(private val simCore: SimCore<S>) {
+class StatisticPriorityQueue<T : Statistical, S : State>(private val simCore: SimCore<S>) {
 
-    private val queue           = PriorityQueue<T>()
-    private var lastChange      = 0.0
-    private var totalTime       = 0.0
-    private var weightTime      = 0.0
-    private var totalWaitTime   = 0.0
-    private var served          = 0.0
+    private val queue = PriorityQueue<T>()
+    private var lastChange = 0.0
+    private var totalTime = 0.0
+    private var weightTime = 0.0
+    private var totalWaitTime = 0.0
+    private var served = 0.0
 
     private fun beforeChange() {
         weightTime += (simCore.currentTime - lastChange) * queue.size
-        totalTime  += (simCore.currentTime - lastChange)
+        totalTime += (simCore.currentTime - lastChange)
     }
 
     fun push(t: T) {
@@ -45,29 +45,31 @@ class  StatisticPriorityQueue<T : Statistical, S : State>(private val simCore: S
 
     fun isNotEmpty() = queue.isNotEmpty()
 
-    fun clear(){
+    fun clear() {
         queue.clear()
-        lastChange      = 0.0
-        totalTime       = 0.0
-        weightTime      = 0.0
-        totalWaitTime   = 0.0
-        served          = 0.0
+        lastChange = 0.0
+        totalTime = 0.0
+        weightTime = 0.0
+        totalWaitTime = 0.0
+        served = 0.0
     }
+
+    fun toList() = queue.toList()
 
 }
 
- class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>) {
+class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>) {
 
-    private val queue           = LinkedList<T>() as Queue<T>
-    private var lastChange      = 0.0
-    private var totalTime       = 0.0
-    private var weightTime      = 0.0
-    private var totalWaitTime   = 0.0
-    private var served          = 0.0
+    private val queue = LinkedList<T>() as Queue<T>
+    private var lastChange = 0.0
+    private var totalTime = 0.0
+    private var weightTime = 0.0
+    private var totalWaitTime = 0.0
+    private var served = 0.0
 
     private fun beforeChange() {
         weightTime += (simCore.currentTime - lastChange) * queue.size
-        totalTime  += (simCore.currentTime - lastChange)
+        totalTime += (simCore.currentTime - lastChange)
     }
 
     fun push(t: T) {
@@ -95,13 +97,14 @@ class  StatisticPriorityQueue<T : Statistical, S : State>(private val simCore: S
 
     fun isNotEmpty() = queue.isNotEmpty()
 
-    fun clear(){
+    fun clear() {
         queue.clear()
-        lastChange      = 0.0
-        totalTime       = 0.0
-        weightTime      = 0.0
-        totalWaitTime   = 0.0
-        served          = 0.0
+        lastChange = 0.0
+        totalTime = 0.0
+        weightTime = 0.0
+        totalWaitTime = 0.0
+        served = 0.0
     }
 
+    fun toList() = queue.toList()
 }

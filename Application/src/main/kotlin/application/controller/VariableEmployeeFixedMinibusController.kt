@@ -34,7 +34,7 @@ class VariableEmployeeFixedMinibusController : Controller() {
 
     private val simulations = (10..30)
         .map { AirCarConfig(numberOfMinibuses = minibus, numberOfEmployees = it) }
-        .map { AirCarRentalSimulation(conf= it,maxSimTime = 60*60*24.0*30,numberOfReplication = 30) }
+        .map { AirCarRentalSimulation(conf= it,maxSimTime = 60*60*24.0*30,numberOfReplication = 2) }
         .onEach {
             it.stopWatching()
             it.log = false
@@ -52,5 +52,11 @@ class VariableEmployeeFixedMinibusController : Controller() {
         }
 
     }
+
+    fun stop() = simulations.forEach { it.stop() }
+
+    fun pause() = simulations.forEach { it.pause() }
+
+    fun resume() = simulations.forEach { it.resume() }
 
 }

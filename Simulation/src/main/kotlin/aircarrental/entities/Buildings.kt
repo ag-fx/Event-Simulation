@@ -19,9 +19,16 @@ data class CarRental(
     val employees: List<Employee>
 )
 
-data class Employee(var isBusy: Boolean = false) {
+data class Employee(
+    val id:Int,
+    var isBusy: Boolean = false,
+    var serving: Customer? = null
+) {
     fun isNotBusy() = !isBusy
 }
+
+
+
 
 /**
  * @return distance to next building in meters

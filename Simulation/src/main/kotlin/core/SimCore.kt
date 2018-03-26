@@ -1,14 +1,8 @@
 package core
 
-import com.sun.org.apache.xml.internal.security.Init
-import com.sun.org.apache.xpath.internal.operations.Bool
-import kotlinx.coroutines.experimental.DefaultDispatcher
 import kotlinx.coroutines.experimental.channels.Channel
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.concurrent.PriorityBlockingQueue
-import kotlin.coroutines.experimental.CoroutineContext
 
 abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int) {
 
@@ -17,13 +11,12 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     private val timeline = PriorityBlockingQueue<Event>()
     private val replicationStates = mutableListOf<S>()
-    private val oneSecond = 1.0
     private var runs = 0
     private var isWatched = true
     var log = true
     var sleepTime = 1000L
-    open var speed = oneSecond //* 60
     protected var isRunning = true
+
     var currentTime = 0.0
         private set(value) {
             field =
@@ -110,11 +103,11 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
      */
     protected abstract fun coolDownEventFilter(event: Event): Boolean
 
-    private val tick = Tick<S>(currentTime + speed)
+    private val tick = Tick<S>(currentTime + 1)
 
     fun planTick() {
         tick.core = this
-        tick.occurrenceTime = currentTime + speed
+        tick.occurrenceTime = currentTime + 1
         timeline.add(tick)
     }
 

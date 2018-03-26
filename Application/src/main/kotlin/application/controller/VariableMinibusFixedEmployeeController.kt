@@ -46,6 +46,12 @@ class VariableMinibusFixedEmployeeController : Controller() {
         }
     }
 
+    fun stop() = simulations.forEach { it.stop() }
+
+    fun pause() = simulations.forEach { it.pause() }
+
+    fun resume() = simulations.forEach { it.resume() }
+
 }
 
 fun <A, B> ObservableList<XYChart.Data<Number, Number>>.add(p: Pair<A, B>) = with(p) { add(XYChart.Data(first as Number, second as Number)) }

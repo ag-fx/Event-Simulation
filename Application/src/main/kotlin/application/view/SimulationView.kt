@@ -23,7 +23,10 @@ class SimulationView : View("Simulácia") {
                 isSortable = false
                 converter(SecondsToMinutesConverter())
             }
-            spacer()
+
+            column("daco",AirCarRentalStateModel::avgQueueSizeTerminalOne)
+            column("daco",AirCarRentalStateModel::avgQueueWaitTimeTerminalOne)
+
 
         }
 

@@ -41,7 +41,7 @@ class AirCarRentalSimulation(
     val carRental = CarRental(
         description = Buildings.AirCarRental,
         queue = StatisticPriorityQueue(this),
-        employees = List(conf.numberOfEmployees) { Employee() }
+        employees = List(conf.numberOfEmployees) { Employee(1+it) }
     )
     //endregion
 
@@ -84,7 +84,6 @@ class AirCarRentalSimulation(
     )
     //endregion
 
-    override var speed = 1.0
     var totalCustomersTime = 0.0
     var numberOfServedCustomers = 0.0
 
@@ -148,6 +147,10 @@ class AirCarRentalSimulation(
         avgQueueWaitTimeTerminalTwo = terminalTwo.queue.averageWaitTime(),
         avgQueueSizeTerminalOne = terminalOne.queue.averageSize(),
         avgQueueSizeTerminalTwo = terminalTwo.queue.averageSize(),
+        terminal1Queue = terminalOne.queue.toList(),
+        terminal2Queue = terminalTwo.queue.toList(),
+        carRentalQueue = carRental.queue.toList(),
+        employees = carRental.employees.toList(),
         customersTimeInSystem = totalCustomersTime / numberOfServedCustomers,
         totalCustomersTime = totalCustomersTime,
         numberOfServedCustomers = numberOfServedCustomers,
@@ -158,6 +161,7 @@ class AirCarRentalSimulation(
         totalTerminal1 = terminalOne.arrivals,
         totalTerminal2 = terminalTwo.arrivals,
         run = replication,
-        config = conf
+        config = conf,
+        replicationNumber = replication
     )
 }
