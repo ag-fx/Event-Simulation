@@ -37,7 +37,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
             field = value
         }
 
-    fun start(context: CoroutineContext = DefaultDispatcher) = launch(context) {
+    suspend fun start() {
         beforeSimulation()
         repeat(replications) {
             beforeReplication()

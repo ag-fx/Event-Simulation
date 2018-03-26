@@ -9,14 +9,7 @@ class SimulationView : View("Simulácia") {
     private val controller: MyController by inject()
 
     override val root = vbox {
-
-        hbox {
-            button("Start") { action { TODO() } }
-            button("Pause") { action { TODO() } }
-            button("Resume") { action { TODO() } }
-            button("Speed up") { action { TODO() } }
-            button("Slow  down") { action { TODO() } }
-        }
+        this += ControlsView()
         tableview(controller.replications) {
             columnResizePolicy = SmartResize.POLICY
 

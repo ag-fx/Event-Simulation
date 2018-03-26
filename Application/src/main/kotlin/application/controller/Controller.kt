@@ -4,8 +4,10 @@ import aircarrental.AirCarConfig
 import aircarrental.AirCarRentalSimulation
 import application.model.AirCarRentalStateModel
 import javafx.beans.property.SimpleStringProperty
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.channels.consumeEach
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.newSingleThreadContext
 import tornadofx.*
 import coroutines.JavaFx as onUi
 
@@ -27,16 +29,15 @@ class MyController : Controller() {
 
     val currentReplicationState = mutableListOf<AirCarRentalStateModel>().observable()
     val replications = mutableListOf<AirCarRentalStateModel>().observable()
+    val thread = newSingleThreadContext("AirCarRentalSimulation")
 
-    fun run() {
+    fun start() {
         testSim.log = false
-       // testSim.stopWatching()
-//        AirCarConfig(numberOfEmployees = 1, numberOfMinibuses = 1) to 16595.1310
-//        val sim = AirCarRentalSimulation(configuration.first, 60 * 60.0 * 24 * 30 , repcount)
+
         launch(onUi) {
             testSim.currentReplicationChannel
                 .consumeEach {
-                    currentReplicationState.add(0,AirCarRentalStateModel(it))
+                    currentReplicationState.add(0, AirCarRentalStateModel(it))
                     text = "${it.customersTimeInSystem.div(60)}"
                     simTime = "${it.currentTime}"
                 }
@@ -47,13 +48,12 @@ class MyController : Controller() {
             testSim.afterReplicationChannel
                 .consumeEach {
                     currentReplicationState.clear()
-                    replications.add(0,AirCarRentalStateModel(it.last()))
+                    replications.add(0, AirCarRentalStateModel(it.last()))
                     simText = "${it.map { it.customersTimeInSystem / 60 }.average()}"
                 }
         }
 
-        testSim.start()
-
+        async(thread) { testSim.start() }
 
     }
 
@@ -81,5 +81,6 @@ class MyController : Controller() {
     fun stopWatching() {
         testSim.stopWatching()
     }
+
 
 }

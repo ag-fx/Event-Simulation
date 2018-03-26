@@ -21,12 +21,17 @@ class TestView : View("TestView") {
             spacer()
             textfield(myController.simTextProperty)
         }
-        myController.run()
         textfield { text = "live ui :)" }
-        button("Speed up") { action { myController.speedUp() } }
-        button("Pause") { action { myController.pause() } }
-        button("Resume") { action { myController.resume() } }
-        button("Stop watching  ") { action { myController.stopWatching() } }
-        button("Start watching ") { action { myController.startWatching() } }
+        hbox {
+            button("Speed up") { action { myController.speedUp() } }
+            spacer()
+            button("Pause") { action { myController.pause() } }
+            spacer()
+            button("Resume") { action { myController.resume() } }
+            spacer()
+            button("Stop watching  ") { action { myController.stopWatching() } }
+            spacer()
+            button("Start watching ") { action { myController.startWatching() } }
+        }
     }
 }
