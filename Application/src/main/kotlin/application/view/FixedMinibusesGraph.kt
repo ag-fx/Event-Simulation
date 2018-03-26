@@ -17,6 +17,7 @@ class FixedEmployeeView : View("Závislosť na počte mikrobusov") {
             button("Start") { action { controller.start() } }
             spacer()
         }
+        spacer()
         linechart<Number, Number>(controller.graphName, x, y){
             series(" ", controller.data)
             series("20 minut", controller.line)
@@ -31,5 +32,7 @@ class FixedEmployeeView : View("Závislosť na počte mikrobusov") {
                 isAutoRanging = true
             }
         }
+        spacer()
+
     }
 }

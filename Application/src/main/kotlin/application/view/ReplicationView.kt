@@ -31,6 +31,7 @@ class ReplicationView : View("Replikácia") {
     private val controller: MyController by inject()
 
     override val root = vbox {
+        spacer()
         this += ControlsView()
         spacer()
         tableview(controller.currentReplicationState) {
@@ -43,6 +44,7 @@ class ReplicationView : View("Replikácia") {
                 isSortable = false
             }
         }
+        spacer()
 
     }
 }
