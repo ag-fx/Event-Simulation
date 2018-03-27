@@ -90,7 +90,7 @@ class AirCarRentalSimulation(
     var totalCustomersTime = 0.0
     var numberOfServedCustomers = 0.0
 
-    var statistics: Statistics? = null//
+    var statistics: Statistics? = null
     val ppl = StatisticQueue<Customer, AirCarRentalState>(this)
 
     override fun plan(event: Event) {
@@ -105,11 +105,11 @@ class AirCarRentalSimulation(
                 source = it.source,
                 destination = it.destination,
                 minibus = it,
-                time = it.leftAt
+                time = 0.0//it.leftAt
             ))
         }
-        val terminalOneArrival = TerminalOneCustomerArrival(currentTime + rndArrivalTerminalOne.next())
-        val terminalTwoArrival = TerminalTwoCustomerArrival(currentTime + rndArrivalTerminalTwo.next())
+        val terminalOneArrival = TerminalOneCustomerArrival(currentTime)// + rndArrivalTerminalOne.next())
+        val terminalTwoArrival = TerminalTwoCustomerArrival(currentTime)// + rndArrivalTerminalTwo.next())
         plan(terminalOneArrival)
         plan(terminalTwoArrival)
     }
@@ -127,10 +127,11 @@ class AirCarRentalSimulation(
     override fun afterWarmUp() {
         avgTimeInSystemTEST.clear()
         terminalOne.queue.clearStat()
-        terminalTwo.arrivals = 0
+        terminalTwo.queue.clearStat()
         carRental.queue.clearStat()
 
     }
+
     override fun afterReplication(replicationNumber: Int) {
         if(replicationNumber==1)
             statistics =  Statistics(0.0 to .0,0.0 to .0,LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList())
@@ -149,7 +150,7 @@ class AirCarRentalSimulation(
             avgWaitTimeAirCarRental.add(carRental.avgWaitTimeForService())
             avgQueueSizeAirCarRental.add(carRental.queue.averageSize())
         }
-       // avgTimeInSystemTEST.clear()  //TODO  resetujem to alebo nie?
+        avgTimeInSystemTEST.clear()  //TODO  resetujem to alebo nie?
     }
 
     override fun clear() {

@@ -11,7 +11,7 @@ data class Terminal(
     var busCount: Int,
     val description: Buildings,
     val queue: StatisticQueue<Customer, AirCarRentalState>
-)
+){}
 
 data class CarRental(
     val description: Buildings,
