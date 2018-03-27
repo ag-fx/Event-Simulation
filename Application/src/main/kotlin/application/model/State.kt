@@ -26,7 +26,8 @@ private val init = AirCarRentalState(
     terminal1Queue = mutableListOf(),
     terminal2Queue = mutableListOf(),
     carRentalQueue = mutableListOf(),
-    employees = mutableListOf()
+    employees = mutableListOf(),
+    statistics = null
 )
 
 val initModel = AirCarRentalStateModel(init)

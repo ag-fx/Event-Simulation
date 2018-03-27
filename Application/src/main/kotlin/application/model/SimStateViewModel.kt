@@ -22,6 +22,7 @@ class AirCarRentalStateModel(state: AirCarRentalState) : tornadofx.ItemViewModel
     val numberOfServedCustomers = bind(AirCarRentalState::numberOfServedCustomers)
     val totalCustomersTime = bind(AirCarRentalState::totalCustomersTime)
     val configu = bind(AirCarRentalState::config)
+    val statistics = bind(AirCarRentalState::statistics)
 
     val terminal1Queue = state.terminal1Queue.map(::CustomerModel).observable()
     val terminal2Queue = state.terminal2Queue.map(::CustomerModel).observable()

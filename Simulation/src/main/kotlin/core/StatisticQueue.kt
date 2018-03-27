@@ -49,6 +49,10 @@ class StatisticPriorityQueue<T : Statistical, S : State>(private val simCore: Si
 
     fun clear() {
         queue.clear()
+        clearStat()
+    }
+
+    fun clearStat() {
         lastChange = 0.0
         totalTime = 0.0
         weightTime = 0.0
@@ -68,6 +72,7 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
     private var totalTime = 0.0
 
     private var weightTime = 0.0
+
     var totalWaitTime = 0.0
         private set(value) {
             field = value
@@ -77,6 +82,7 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
     private fun beforeChange() {
         weightTime += (simCore.currentTime - lastChange) * queue.size
         totalTime += (simCore.currentTime - lastChange)
+
     }
 
     fun push(t: T) {
@@ -114,6 +120,10 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
 
     fun clear() {
         queue.clear()
+        clearStat()
+    }
+
+    fun clearStat(){
         lastChange = 0.0
         totalTime = 0.0
         weightTime = 0.0
@@ -123,5 +133,36 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
 
     fun toList() = queue.toList()
 
+}
 
+abstract class Stat {
+
+    private var sumXpow2 = 0.0
+    private var sumX = 0.0
+    private var served = 0
+
+    private val alfa = 1.645
+
+
+
+    fun meanConfidence90(): Double {
+        val standDeviation = Math.sqrt(1 / (served*1.0)  * sumXpow2 - Math.pow(1 / (served*1.0) * sumX, 2.0))
+        return 1.645 * (standDeviation / Math.sqrt(served*1.0))
+    }
+
+    fun average() = sumX / served
+
+    fun interval() = average() - meanConfidence90() to average() + meanConfidence90()
+
+    fun add(t: Double) {
+        sumX += t
+        sumXpow2 += t.pow(2)
+        served++
+    }
+
+    fun clear() { //TODO zavolat v after replication
+        sumX = 0.0
+        sumXpow2 = 0.0
+        served = 0
+    }
 }

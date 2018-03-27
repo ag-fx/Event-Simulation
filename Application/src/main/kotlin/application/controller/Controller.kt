@@ -5,6 +5,7 @@ import aircarrental.AirCarRentalSimulation
 import application.model.*
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.channels.consumeEach
 import kotlinx.coroutines.experimental.launch
@@ -16,12 +17,11 @@ import tornadofx.setValue
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class MyController : Controller() {
+class MyController : SimulationController() {
 
-    private val testSim = AirCarRentalSimulation(
-        conf = AirCarConfig(numberOfEmployees = 8, numberOfMinibuses = 5),
-        maxSimTime = 60.0 * 60.0 * 24.0 * 30.0,
-        numberOfReplication = 100)
+    private lateinit var testSim: AirCarRentalSimulation
+    val threadJobs = mutableListOf<Job>()
+
 
     val speedProperty = SimpleDoubleProperty(500.0)
     var speed by speedProperty
@@ -31,9 +31,8 @@ class MyController : Controller() {
 
 
     val currentRepProperty = SimpleObjectProperty<AirCarRentalStateModel>(initModel)
-    var currentRep by currentRepProperty
+    private var currentRep by currentRepProperty
 
-    val currentReplicationState = mutableListOf<AirCarRentalStateModel>().observable()
 
     val terminal1ppl = mutableListOf<CustomerModel>().observable()
     val terminal2ppl = mutableListOf<CustomerModel>().observable()
@@ -41,17 +40,29 @@ class MyController : Controller() {
     val minubuses = mutableListOf<MinibusModel>().observable()
     val employees = mutableListOf<EmployeeModel>().observable()
 
-    val replications = mutableListOf<AirCarRentalStateModel>().observable()
     private val thread = newSingleThreadContext("AirCarRentalSimulation")
 
-    fun start() {
+    override fun start() {
+        println("start")
+        testSim = AirCarRentalSimulation(
+            conf = AirCarConfig(numberOfEmployees = maxNumberOfEmployees, numberOfMinibuses = maxNumberOfMinibuses),
+            maxSimTime = 60.0 * 60.0 * 24.0 * numberOfDays,
+            numberOfReplication = numberOfReplication)
+
+        println("deme")
+        println("""
+            maxNumberOfEmployees $maxNumberOfEmployees
+            maxNumberOfMinibuses $maxNumberOfMinibuses
+            numberOfDays $numberOfDays
+            numberOfReplication $numberOfReplication
+        """.trimIndent())
         testSim.log = false
 
-        launch(onUi) {
+        val j1 = launch(onUi) {
             testSim.currentReplicationChannel
                 .consumeEach {
                     currentRep = AirCarRentalStateModel(it)
-                    currentReplicationState.add(0, AirCarRentalStateModel(it))
+                    //  currentReplicationState.add(0, AirCarRentalStateModel(it))
                     terminal1ppl.setAll(it.terminal1Queue.map { CustomerModel(it) })
                     terminal2ppl.setAll(it.terminal2Queue.map { CustomerModel(it) })
                     aircarppl.setAll(it.carRentalQueue.map { CustomerModel(it) })
@@ -63,29 +74,30 @@ class MyController : Controller() {
 
         }
 
-        launch(onUi) {
+        val j2 = launch(onUi) {
             testSim.afterReplicationChannel
                 .consumeEach {
                     currentRep = AirCarRentalStateModel(it.last())
-                    currentReplicationState.clear()
-                    replications.add(0, AirCarRentalStateModel(it.last()))
-                    val avg = it.map { it.averageTimeOfCustomerInSystem/60 }.average()
-                    val nieco2 = it.map { (it.averageTimeOfCustomerInSystem - avg).pow(2) }.average()
-                    val left = avg - (1.645* sqrt(nieco2))/sqrt(it.size-1.0)
-                    val right = avg + (1.645* sqrt(nieco2))/sqrt(it.size-1.0)
-                    println((left to right).map { it/60 })
                 }
         }
 
-        async(thread) { testSim.start() }
+        val j3 = launch(thread) { testSim.start() }
+        threadJobs.addAll(listOf(j1,j2,j3))
 
     }
 
-    fun pause() {
+    override fun pause() {
         testSim.pause()
     }
 
-    fun resume() {
+    override fun stop() {
+        testSim.stop()
+      //  threadJobs.forEach { it.cancel() }
+      //  threadJobs.clear()
+        currentRep = initModel
+    }
+
+    override fun resume() {
         testSim.resume()
     }
 
@@ -111,5 +123,4 @@ class MyController : Controller() {
 }
 
 
-
-fun <T> Pair<T, T>.map(transform: (T) -> T): Pair<T,T> = transform(first) to transform(second)
+fun <T> Pair<T, T>.map(transform: (T) -> T): Pair<T, T> = transform(first) to transform(second)

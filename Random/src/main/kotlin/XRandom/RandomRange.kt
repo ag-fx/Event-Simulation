@@ -2,7 +2,11 @@ package XRandom
 
 import java.util.*
 
-class RandomRange(private val min: Double, private val max: Double, rndSeedNumber: Long) : NextRandom<Double> {
+class RandomRange(
+    private val min: Double,
+    private val max: Double,
+    rndSeedNumber: Long
+) : NextRandom<Double> {
 
     init {
         if (min > max) throw IllegalArgumentException("max is bigger than min")

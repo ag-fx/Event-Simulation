@@ -16,6 +16,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     var log = true
     var sleepTime = 1000L
     protected var isRunning = true
+    abstract var warmUpSeconds: Double
 
     var currentTime = 0.0
         private set(value) {
@@ -31,13 +32,16 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         }
 
     suspend fun start() {
+        stop = false
+       // currentReplicationChannel
+       // afterReplicationChannel.o
         beforeSimulation()
         repeat(replications) { replicationNumber ->
             beforeReplication()
             simulate(replicationNumber)
             coolDown()
-            afterReplication(replicationNumber+1)
-            replicationStates += toState(replicationNumber+1, currentTime)
+            afterReplication(replicationNumber + 1)
+            replicationStates += toState(replicationNumber + 1, currentTime)
             if (!stop)
                 afterReplicationChannel.send(replicationStates)
         }
@@ -48,21 +52,22 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     private suspend fun simulate(replicationNumber: Int) {
         if (isWatched())
             planTick()
-
+        var notWarmedUp = true
         while (shouldSimulate()) {
 
             if (isSimulationRunning()) {
-
                 val currentEvent = timeline.poll()
                 currentTime = currentEvent.occurrenceTime
                 log(currentEvent)
                 currentEvent.execute()
-
-                if (isWatched()) {
+                if (currentTime > warmUpSeconds && notWarmedUp) {
+                    notWarmedUp = false
+                    afterWarmUp()
+                }
+                if (isWatched() && currentTime > warmUpSeconds) {
                     val state = toState(replicationNumber, currentTime)
                     currentReplicationChannel.send(state)
                 }
-
             } else {
                 Thread.sleep(250)
             }
@@ -75,6 +80,8 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
         }
     }
+
+    abstract fun afterWarmUp()
 
     private suspend fun coolDown() {
         while (timeline.isNotEmpty()) {
@@ -102,6 +109,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
      * @return True if event should be executed in cooldown
      */
     protected abstract fun coolDownEventFilter(event: Event): Boolean
+
     var oneTick = 1.0
     private val tick = Tick<S>(currentTime + oneTick)
 
@@ -133,6 +141,10 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
      * Always call super when overriding
      */
     protected open fun afterSimulation() {
+        closeChannels()
+    }
+
+    private fun closeChannels() {
         afterReplicationChannel.close()
         currentReplicationChannel.close()
     }
@@ -163,6 +175,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
     }
 
     fun stop() {
+        closeChannels()
         stop = true
     }
 
@@ -179,7 +192,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     private fun isSimulationRunning() = isRunning && !stop
 
-    private fun shouldSimulate() = (currentTime < maxSimTime) && timeline.isNotEmpty()
+    private fun shouldSimulate() = (currentTime < maxSimTime + warmUpSeconds) && timeline.isNotEmpty()
 
     fun log(s: Any) = if (log) println(s) else Unit
 

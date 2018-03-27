@@ -1,7 +1,6 @@
 package application.view
 
 import application.controller.MyController
-import application.model.AirCarRentalStateModel
 import application.view.converter.*
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
@@ -22,6 +21,7 @@ class ControlsView : View("Controls") {
         button("Start watching") { action { controller.startWatching() } }
         spacer()
         button("Start") { action { controller.start() } }
+        button("Stop") { action { controller.stop() } }
     }
 
 }
@@ -92,7 +92,7 @@ class ReplicationView : View("Replikácia") {
             hbox {
                 label("Počet ľudí Terminál 1")
                 spacer()
-                label(controller.currentRepProperty, converter = TerminalOneWaitingPoeple())
+                label(controller.currentRepProperty, converter = TerminalOneWaitingPeople())
             }
             hbox {
                 label("Priemerna dlzka radu Terminál 1")
@@ -113,7 +113,7 @@ class ReplicationView : View("Replikácia") {
             hbox {
                 label("Počet ľudí Terminál 2")
                 spacer()
-                label(controller.currentRepProperty, converter = TerminalTwoWaitingPoeple())
+                label(controller.currentRepProperty, converter = TerminalTwoWaitingPeople())
             }
             hbox {
                 label("Priemerna dlzka radu Terminál 2")

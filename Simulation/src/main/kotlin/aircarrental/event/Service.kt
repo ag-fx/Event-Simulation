@@ -30,6 +30,9 @@ class ServiceEnd(
         employee.isBusy = false
         employee.serving = null
         totalCustomersTime += (currentTime - customer.arrivedToSystem)
+
+        avgTimeInSystemTEST.add(currentTime - customer.arrivedToSystem)
+
         numberOfServedCustomers++
         if(carRental.queue.isNotEmpty())
             plan(Service(employee,carRental.queue.pop(),currentTime))

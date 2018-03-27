@@ -33,11 +33,9 @@ data class AirCarRentalState(
     val terminal1Queue: List<Customer>,
     val terminal2Queue: List<Customer>,
     val carRentalQueue: List<Customer>,
-    val employees: List<Employee>
+    val employees: List<Employee>,
+    val statistics: Statistics?= null
 ) : State
-
-
-
 
 data class AirCarConfig(
         val numberOfMinibuses: Int,

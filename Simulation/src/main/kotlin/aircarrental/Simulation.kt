@@ -6,15 +6,15 @@ import aircarrental.entities.*
 import aircarrental.event.*
 import core.*
 import java.util.*
-import kotlin.math.pow
 
+class TimeInSystem:Stat()
 
 class AirCarRentalSimulation(
     val conf: AirCarConfig,
     maxSimTime: Double = 60 * 60 * 24 * 30.0,
     val numberOfReplication: Int = 100
 ) : SimCore<AirCarRentalState>(maxSimTime, numberOfReplication) {
-
+    override var warmUpSeconds = 60*60*24.0
     //region entities
     private val minibuses = List(conf.numberOfMinibuses) {
         Minibus(
@@ -85,10 +85,12 @@ class AirCarRentalSimulation(
     )
     //endregion
 
+    val avgTimeInSystemTEST = TimeInSystem()
+
     var totalCustomersTime = 0.0
     var numberOfServedCustomers = 0.0
-    var statistics = Statistics(LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList())
 
+    var statistics: Statistics? = null//
     val ppl = StatisticQueue<Customer, AirCarRentalState>(this)
 
     override fun plan(event: Event) {
@@ -122,21 +124,32 @@ class AirCarRentalSimulation(
     override fun beforeSimulation() {
     }
 
-    var avgWaitTimeT1 = 0.0
-    var avgWaitTimeT2 = 0.0
-    var avgWaitTimeAirCarRental = 0.0
-    var simTotalCustomersTime = 0.0
+    override fun afterWarmUp() {
+        avgTimeInSystemTEST.clear()
+        terminalOne.queue.clearStat()
+        terminalTwo.arrivals = 0
+        carRental.queue.clearStat()
 
+    }
     override fun afterReplication(replicationNumber: Int) {
-        with(statistics) {
-            avgTimeInSystem.add(totalCustomersTime / numberOfServedCustomers)
-            avgWaitTimeTerminal1.add(terminalOne.queue.averageSize())
-            avgWaitTimeTerminal2.add(terminalTwo.queue.averageSize())
-            avgWaitTimeTerminalAirCarRental.add()
-            avgQueueSizeTerminal1.add()
-            avgQueueSizeTerminal2.add()
-            avgQueueSizeTerminalAirCarRental.add()
+        if(replicationNumber==1)
+            statistics =  Statistics(0.0 to .0,0.0 to .0,LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList())
+
+        with(statistics!!) {
+
+//            avgTimeInSystemTEST.add((totalCustomersTime / numberOfServedCustomers))
+            avgTimeInSystem.add(avgTimeInSystemTEST.average())
+            interval = avgTimeInSystemTEST.interval()
+            avgWaitTimeTerminal1.add(terminalOne.queue.averageWaitTime())
+            avgWaitTimeTerminal2.add(terminalTwo.queue.averageWaitTime())
+
+            avgQueueSizeTerminal1.add(terminalOne.queue.averageSize())
+            avgQueueSizeTerminal2.add(terminalTwo.queue.averageSize())
+
+            avgWaitTimeAirCarRental.add(carRental.avgWaitTimeForService())
+            avgQueueSizeAirCarRental.add(carRental.queue.averageSize())
         }
+       // avgTimeInSystemTEST.clear()  //TODO  resetujem to alebo nie?
     }
 
     override fun clear() {
@@ -163,6 +176,7 @@ class AirCarRentalSimulation(
 
 
     override fun toState(replication: Int, simTime: Double) = AirCarRentalState(
+        statistics = statistics,
         avgQueueWaitTimeTerminalOne = terminalOne.queue.averageWaitTime(),
         avgQueueWaitTimeTerminalTwo = terminalTwo.queue.averageWaitTime(),
         avgQueueWaitTimeCarRental = carRental.avgWaitTimeForService(),
