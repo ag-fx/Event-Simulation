@@ -6,12 +6,10 @@ import tornadofx.*
 class MainView : View("Hello TornadoFX") {
 
 
-    override val root = hbox {
+    override val root = borderpane {
         minWidth = 600.0
 
-        tabpane {
-            fitToWidth(this@hbox)
-            fitToHeight(this@hbox)
+        center = tabpane {
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
             tab(FixedMinibusView::class)
             tab(FixedEmployeeView::class)

@@ -15,7 +15,7 @@ class MinibusGoTo(
             destination = this@MinibusGoTo.destination
             source = this@MinibusGoTo.source
             leftAt = currentTime
-            isInSource = false
+            isInDestination = false
         }
 
         val timeToGetThere = source.distanceToNext() / minibus.averageSpeed

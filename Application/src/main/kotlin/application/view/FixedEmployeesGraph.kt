@@ -31,11 +31,11 @@ class FixedMinibusView(val name: String = "Závislosť na počte pracovníkov") 
                     valueProperty().bindBidirectional(controller.minNumberOfMinibusesProperty)
                 }
                 spacer()
-                label("Min Pocet pracovnikov ")
+                label("Min Pocet pracovnikov")
                 choicebox(values = (10..30).toList()) {
                     valueProperty().bindBidirectional(controller.minNumberOfEmployeesProperty)
                 }
-                label("Max Pocet pracovnikov ")
+                label("Max Pocet pracovnikov")
                 choicebox(values = (11..30).toList()) {
                     valueProperty().bindBidirectional(controller.maxNumberOfEmployeesProperty)
                 }
@@ -52,8 +52,6 @@ class FixedMinibusView(val name: String = "Závislosť na počte pracovníkov") 
                     valueProperty().bindBidirectional(controller.numberOfDaysProperty)
                 }
                 spacer()
-
-
             }
         }
         center = linechart<Number, Number>("", x, y) {

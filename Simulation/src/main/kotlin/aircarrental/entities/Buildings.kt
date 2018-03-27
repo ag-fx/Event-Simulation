@@ -16,8 +16,13 @@ data class Terminal(
 data class CarRental(
     val description: Buildings,
     val queue: StatisticPriorityQueue<Customer, AirCarRentalState>,
-    val employees: List<Employee>
-)
+    val employees: List<Employee>,
+    var serviceTotalWaitTime: Double = 0.0,
+    var served: Int = 0
+
+) {
+    fun avgWaitTimeForService() :Double = serviceTotalWaitTime / (served*1.0)
+}
 
 data class Employee(
     val id:Int,

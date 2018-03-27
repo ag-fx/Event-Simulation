@@ -65,8 +65,6 @@ class FixedEmployeeView : View("Závislosť na počte mikrobusov") {
                 with(xAxis as NumberAxis) {
                     isForceZeroInRange = false
                     isAutoRanging = true
-                    //lowerBoundProperty().bind(controller.minNumberOfEmployeesProperty)
-                    //upperBoundProperty().bind(controller.maxNumberOfEmployeesProperty)
                 }
                 with(yAxis as NumberAxis) {
                     isForceZeroInRange = false

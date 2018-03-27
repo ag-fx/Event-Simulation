@@ -24,7 +24,7 @@ fun main(args: Array<String>) = runBlocking {
     val repcount = 500
     configurations.forEach { configuration ->
          val sim = AirCarRentalSimulation(configuration.first, 60 * 60.0 * 24 * 30 , repcount)
-        sim.speed = 1200.0
+//        sim.speed = 1200.0
         sim.stopWatching()
         sim.log = false
         sim.start()
@@ -32,7 +32,7 @@ fun main(args: Array<String>) = runBlocking {
         sim.afterReplicationChannel
             .filterIndexed { index, list -> index % 20 == 0 }
             .consumeEach {
-                    val avgInSystem = it.map { it.customersTimeInSystem / 60 }.average()
+                    val avgInSystem = it.map { it.averageTimeOfCustomerInSystem / 60 }.average()
                 println("$avgInSystem \t ${avgInSystem - configuration.second} \t $configuration")
             }
 

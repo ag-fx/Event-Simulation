@@ -6,11 +6,12 @@ import aircarrental.entities.*
 import aircarrental.event.*
 import core.*
 import java.util.*
+import kotlin.math.pow
 
 
 class AirCarRentalSimulation(
     val conf: AirCarConfig,
-     maxSimTime: Double = 60*60*24*30.0,
+    maxSimTime: Double = 60 * 60 * 24 * 30.0,
     val numberOfReplication: Int = 100
 ) : SimCore<AirCarRentalState>(maxSimTime, numberOfReplication) {
 
@@ -41,7 +42,7 @@ class AirCarRentalSimulation(
     val carRental = CarRental(
         description = Buildings.AirCarRental,
         queue = StatisticPriorityQueue(this),
-        employees = List(conf.numberOfEmployees) { Employee(1+it) }
+        employees = List(conf.numberOfEmployees) { Employee(1 + it) }
     )
     //endregion
 
@@ -86,6 +87,9 @@ class AirCarRentalSimulation(
 
     var totalCustomersTime = 0.0
     var numberOfServedCustomers = 0.0
+    var statistics = Statistics(LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList(), LinkedList())
+
+    val ppl = StatisticQueue<Customer, AirCarRentalState>(this)
 
     override fun plan(event: Event) {
         val simEvent = (event as AcrEvent).apply { core = this@AirCarRentalSimulation }
@@ -118,7 +122,21 @@ class AirCarRentalSimulation(
     override fun beforeSimulation() {
     }
 
-    override fun afterReplication() {
+    var avgWaitTimeT1 = 0.0
+    var avgWaitTimeT2 = 0.0
+    var avgWaitTimeAirCarRental = 0.0
+    var simTotalCustomersTime = 0.0
+
+    override fun afterReplication(replicationNumber: Int) {
+        with(statistics) {
+            avgTimeInSystem.add(totalCustomersTime / numberOfServedCustomers)
+            avgWaitTimeTerminal1.add(terminalOne.queue.averageSize())
+            avgWaitTimeTerminal2.add(terminalTwo.queue.averageSize())
+            avgWaitTimeTerminalAirCarRental.add()
+            avgQueueSizeTerminal1.add()
+            avgQueueSizeTerminal2.add()
+            avgQueueSizeTerminalAirCarRental.add()
+        }
     }
 
     override fun clear() {
@@ -129,6 +147,8 @@ class AirCarRentalSimulation(
         terminalTwo.arrivals = 0
         carRental.queue.clear()
         carRental.employees.forEach { it.isBusy = false }
+        carRental.served = 0
+        carRental.serviceTotalWaitTime = 0.0
 
         minibuses.forEach {
             val source = Buildings.values()[rndSource.nextInt(Buildings.values().size)]
@@ -145,13 +165,18 @@ class AirCarRentalSimulation(
     override fun toState(replication: Int, simTime: Double) = AirCarRentalState(
         avgQueueWaitTimeTerminalOne = terminalOne.queue.averageWaitTime(),
         avgQueueWaitTimeTerminalTwo = terminalTwo.queue.averageWaitTime(),
+        avgQueueWaitTimeCarRental = carRental.avgWaitTimeForService(),
+
         avgQueueSizeTerminalOne = terminalOne.queue.averageSize(),
         avgQueueSizeTerminalTwo = terminalTwo.queue.averageSize(),
+        avgQueueSizeCarRental = carRental.queue.averageSize(),
+
         terminal1Queue = terminalOne.queue.toList(),
         terminal2Queue = terminalTwo.queue.toList(),
         carRentalQueue = carRental.queue.toList(),
+
         employees = carRental.employees.toList(),
-        customersTimeInSystem = totalCustomersTime / numberOfServedCustomers,
+        averageTimeOfCustomerInSystem = totalCustomersTime / numberOfServedCustomers,
         totalCustomersTime = totalCustomersTime,
         numberOfServedCustomers = numberOfServedCustomers,
         running = isRunning,
@@ -162,6 +187,7 @@ class AirCarRentalSimulation(
         totalTerminal2 = terminalTwo.arrivals,
         run = replication,
         config = conf,
-        replicationNumber = replication
+        replicationNumber = replication,
+        interval = .0 to .0
     )
 }

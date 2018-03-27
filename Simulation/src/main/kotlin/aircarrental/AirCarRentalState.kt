@@ -10,11 +10,19 @@ data class AirCarRentalState(
     val minibuses: List<Minibus>,
     val avgQueueSizeTerminalOne: Double,
     val avgQueueSizeTerminalTwo: Double,
+    val avgQueueSizeCarRental: Double,
+
     val avgQueueWaitTimeTerminalOne: Double,
     val avgQueueWaitTimeTerminalTwo: Double,
-    val customersTimeInSystem: Double,
+    val avgQueueWaitTimeCarRental: Double,
+
+    val averageTimeOfCustomerInSystem: Double,
+
+    val interval: Pair<Double, Double>,
+
     val totalTerminal1: Int,
     val totalTerminal2: Int,
+
     override val running: Boolean,
     override val stopped: Boolean,
     override val currentTime: Double,

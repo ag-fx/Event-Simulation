@@ -2,11 +2,9 @@ package application.controller
 
 import aircarrental.AirCarConfig
 import aircarrental.AirCarRentalSimulation
-import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections.observableArrayList
 import javafx.collections.ObservableList
 import javafx.scene.chart.XYChart
-import kotlinx.coroutines.experimental.ThreadPoolDispatcher
 import kotlinx.coroutines.experimental.channels.consumeEach
 import kotlinx.coroutines.experimental.channels.filter
 import kotlinx.coroutines.experimental.launch
@@ -16,7 +14,6 @@ import coroutines.JavaFx as onUi
 
 
 class VariableMinibusFixedEmployeeController : SimulationController() {
-
 
     val data = observableArrayList<XYChart.Data<Number, Number>>()!!
     val line = (0..30)
@@ -45,16 +42,16 @@ class VariableMinibusFixedEmployeeController : SimulationController() {
                 rep
                     .filter { it.size == sim.numberOfReplication - 1 }
                     .consumeEach {
-                        data.add(sim.conf.numberOfMinibuses to it.map { it.customersTimeInSystem / 60 }.average())
+                        data.add(sim.conf.numberOfMinibuses to it.map { it.averageTimeOfCustomerInSystem / 60 }.average())
                     }
             }
 
         }
     }
 
-    override fun stop() = simulations.forEach { it.stop() }
+    override fun stop()   = simulations.forEach { it.stop() }
 
-    override fun pause() = simulations.forEach { it.pause() }
+    override fun pause()  = simulations.forEach { it.pause() }
 
     override fun resume() = simulations.forEach { it.resume() }
 

@@ -8,9 +8,12 @@ private val init = AirCarRentalState(
     minibuses = mutableListOf(),
     avgQueueSizeTerminalOne = 0.0,
     avgQueueSizeTerminalTwo = 0.0,
+    avgQueueSizeCarRental = 0.0,
     avgQueueWaitTimeTerminalOne = 0.0,
     avgQueueWaitTimeTerminalTwo = 0.0,
-    customersTimeInSystem = 0.0,
+    avgQueueWaitTimeCarRental = 0.0,
+    averageTimeOfCustomerInSystem = 0.0,
+    interval = 0.0 to 0.0,
     totalTerminal1 = 0,
     totalTerminal2 = 0,
     running = false,
@@ -26,4 +29,4 @@ private val init = AirCarRentalState(
     employees = mutableListOf()
 )
 
- val initModel = AirCarRentalStateModel(init)
+val initModel = AirCarRentalStateModel(init)

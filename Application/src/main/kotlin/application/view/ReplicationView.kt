@@ -2,10 +2,9 @@ package application.view
 
 import application.controller.MyController
 import application.model.AirCarRentalStateModel
-import application.view.converter.ReplicationConverter
-import application.view.converter.SimTimeConverter
-import application.view.converter.SimTimeToRealTimeConverter
+import application.view.converter.*
 import javafx.geometry.Insets
+import javafx.geometry.Orientation
 import javafx.scene.control.TabPane
 import tornadofx.*
 
@@ -14,19 +13,17 @@ class ControlsView : View("Controls") {
 
     private val controller: MyController by inject()
 
-    override val root = vbox {
-        hbox {
-            button("Pause") { action { controller.pause() } }
-            spacer()
-            button("Start") { action { controller.start() } }
-            spacer()
-            button("Resume") { action { controller.resume() } }
-            spacer()
-            button("Stop watching") { action { controller.stopWatching() } }
-            spacer()
-            button("Start watching") { action { controller.startWatching() } }
-        }
+    override val root = hbox {
+        padding = Insets(12.0)
+        button("Pause") { action { controller.pause() } }
+        button("Resume") { action { controller.resume() } }
+        spacer()
+        button("Stop watching") { action { controller.stopWatching() } }
+        button("Start watching") { action { controller.startWatching() } }
+        spacer()
+        button("Start") { action { controller.start() } }
     }
+
 }
 
 class ReplicationView : View("Replikácia") {
@@ -40,7 +37,6 @@ class ReplicationView : View("Replikácia") {
             spacer()
             label("Dlžka uspania po jednej sekunde")
             hbox {
-                fitToWidth(this)
                 hbox {
                     label("max speed")
                     slider(min = 0, max = 500) {
@@ -48,9 +44,12 @@ class ReplicationView : View("Replikácia") {
                         setOnMouseReleased { controller.updateSpeed() }
                     }
                     label("min speed")
+                    padding = Insets(6.0)
                 }
-                spacer()
+                separator(Orientation.VERTICAL)
                 hbox {
+                    padding = Insets(6.0)
+
                     label("1 sekunda")
                     slider(min = 1, max = 300) {
                         valueProperty().bindBidirectional(controller.tickProperty)
@@ -69,26 +68,115 @@ class ReplicationView : View("Replikácia") {
             tab(MinibusesView::class)
         }
         right = vbox {
-            padding = Insets(10.0)
-            minWidth = 200.0
+            padding = Insets(24.0)
+            minWidth = 300.0
             hbox {
                 label("Simulacny cas")
                 spacer()
                 label(controller.currentRepProperty, converter = SimTimeConverter())
             }
-            spacer()
             hbox {
                 label("Simulacny cas")
                 spacer()
                 label(controller.currentRepProperty, converter = SimTimeToRealTimeConverter())
 
             }
-            spacer()
             hbox {
                 label("Replikacia")
                 spacer()
-                label(controller.currentRepProperty, converter = ReplicationConverter())
+                label(controller.currentRepProperty, converter = XConverter{
+                    it?.replicationNumber?.toString() ?: "err"
+                })
+            }
+            separator()
+            hbox {
+                label("Počet ľudí Terminál 1")
+                spacer()
+                label(controller.currentRepProperty, converter = TerminalOneWaitingPoeple())
+            }
+            hbox {
+                label("Priemerna dlzka radu Terminál 1")
+                spacer()
+                label(controller.currentRepProperty, converter = XConverter{
+                    it?.avgQueueSizeTerminalOne?.let { decimalFormat.format(it) } ?: "err"
+                })
+            }
+            hbox {
+                label("Priemerny cas v rade Terminál 1")
+                spacer()
+                label(controller.currentRepProperty, converter = XConverter{
+                    it?.avgQueueWaitTimeTerminalOne?.let { decimalFormat.format(it/60) + " min" } ?: "err"
+                })
+            }
+            separator()
 
+            hbox {
+                label("Počet ľudí Terminál 2")
+                spacer()
+                label(controller.currentRepProperty, converter = TerminalTwoWaitingPoeple())
+            }
+            hbox {
+                label("Priemerna dlzka radu Terminál 2")
+                spacer()
+                label(controller.currentRepProperty, converter = XConverter{
+                    it?.avgQueueSizeTerminalTwo?.let { decimalFormat.format(it) }  ?: "err"
+                })
+            }
+            hbox {
+                label("Priemerny cas v rade Terminál 2")
+                spacer()
+                label(controller.currentRepProperty, converter = XConverter{
+                    it?.avgQueueWaitTimeTerminalTwo?.let { decimalFormat.format(it/60) }  ?: "err"
+                })
+            }
+            separator()
+
+            hbox {
+                label("Počet ľudí v autobusoch")
+                spacer()
+                label(controller.currentRepProperty, converter = XConverter {
+                    it?.minibuses?.map { it.seats.size() }?.sum()?.toString() ?: "0"
+                })
+            }
+            separator()
+            hbox {
+                label("Počet ľudí v rade AirCarRental")
+                spacer()
+                label(controller.currentRepProperty, converter = AirCarRentalWaitingPoeple())
+            }
+            hbox {
+                label("Priemerna dlzka radu AirCarRental")
+                spacer()
+                label(controller.currentRepProperty, converter = XConverter{
+                    it?.avgQueueSizeCarRental?.let { decimalFormat.format(it) }  ?: "err"
+                })
+            }
+
+            hbox {
+                label("Priemerna dlzka cakania AirCarRental")
+                spacer()
+                label(controller.currentRepProperty, converter = XConverter{
+                    it?.avgQueueWaitTimeCarRental?.let { decimalFormat.format(it/60) }  ?: "err"
+                })
+            }
+            hbox {
+                label("Počet voľných pracovníkov")
+                spacer()
+                label(controller.currentRepProperty, converter = AirCarRentalFreeEmployee())
+            }
+            hbox {
+                label("Počet obsluhovaných zákazníkov")
+                spacer()
+                label(controller.currentRepProperty, converter = XConverter{
+                    it?.employees?.filter { it.isBusy }?.size?.toString() ?: "0"
+                })
+            }
+            hbox {
+                label("Počet vybavených zákazníkov")
+                spacer()
+                label(controller.currentRepProperty, converter = XConverter {
+                    it?.numberOfServedCustomers?.toString() ?: "0"
+                })
             }
 
         }

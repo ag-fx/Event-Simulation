@@ -13,7 +13,7 @@ data class Minibus(
     val seats: StatisticQueue<Customer, AirCarRentalState>,
     var destination: Buildings,
     var source: Buildings,
-    var isInSource :Boolean = false,
+    var isInDestination: Boolean = false,
     var leftAt: Double,
     var distanceToDestination: Double
 ) {
@@ -31,11 +31,16 @@ data class Minibus(
      * @return distance in meters from source
      */
     fun distanceFromSource(currentSimTime: Double): Double {
-        val x = (currentSimTime - leftAt) * averageSpeed
-        return if (x > 0) x else 0.0
+        return if (!isInDestination)
+            Math.abs((currentSimTime - leftAt) * averageSpeed)
+        else 0.0
     }
 
-    fun distanceFromDestinatioN(currentSimTime: Double) = source.distanceToNext() - distanceFromSource(currentSimTime)
+    fun distanceFromDestinatioN(currentSimTime: Double) :Double {
+        return if(!isInDestination)
+            source.distanceToNext() - distanceFromSource(currentSimTime)
+        else 0.0
+    }
 
 }
 

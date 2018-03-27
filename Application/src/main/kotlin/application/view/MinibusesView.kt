@@ -12,20 +12,21 @@ class MinibusesView : View("Minibusy") {
     override val root = borderpane {
         center = tableview(controller.minubuses) {
             maxWidth = 500.0
-            column("ID", MinibusModel::id)
-            column("Odkial", MinibusModel::source)
-            column("Kam", MinibusModel::destination)
-            column("Odisiel", MinibusModel::leftAt)
-            //column("vzdialenost do ciela", MinibusModel::distanceFromSource)
-            column("Je v zastavke", MinibusModel::isInSource)
+            column("ID", MinibusModel::id).apply { isSortable = false }
+            column("Odkial", MinibusModel::source).apply { isSortable = false }
+            column("Kam", MinibusModel::destination).apply { isSortable = false }
+            column("Odisiel", MinibusModel::leftAt).apply { isSortable = false }
+            column("vzdialenost do ciela", MinibusModel::distanceFromDestination)
+            column("Je v zastavke", MinibusModel::isInSource).apply { isSortable = false }
             onSelectionChange {
-                selected.set(it?.seats?.toList()?.map { CustomerModel(it) }?.observable() ?: emptyList<CustomerModel>().observable())
+                selected.set(it?.seats?.toList()?.map { CustomerModel(it) }?.observable()
+                    ?: emptyList<CustomerModel>().observable())
             }
         }
         right = tableview(selected) {
-            column("ID", CustomerModel::id)
-            column("Terminal", CustomerModel::terminal)
-            column("Cas vstupu", CustomerModel::arrivedToSystem)
+            column("ID", CustomerModel::id).apply { isSortable = false }
+            column("Terminal", CustomerModel::terminal).apply { isSortable = false }
+            column("Cas vstupu", CustomerModel::arrivedToSystem).apply { isSortable = false }
         }
     }
 }

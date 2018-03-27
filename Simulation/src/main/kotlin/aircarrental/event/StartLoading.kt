@@ -11,7 +11,7 @@ class StartLoading(
 ) : AcrEvent(time) {
 
     override fun execute() = with(core) {
-        minibus.isInSource = true
+        minibus.isInDestination = true
         if (minibus.isNotFull() && terminal.queue.isNotEmpty())
             plan(EnterToMinibus(
                 minibus = minibus,

@@ -1,6 +1,8 @@
 package core
 
 import java.util.*
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 interface Statistical {
     var arrivedToSystem: Double
@@ -56,6 +58,7 @@ class StatisticPriorityQueue<T : Statistical, S : State>(private val simCore: Si
 
     fun toList() = queue.toList()
 
+
 }
 
 class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>) {
@@ -63,9 +66,13 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
     private val queue = LinkedList<T>() as Queue<T>
     private var lastChange = 0.0
     private var totalTime = 0.0
+
     private var weightTime = 0.0
-    private var totalWaitTime = 0.0
-    private var served = 0.0
+    var totalWaitTime = 0.0
+        private set(value) {
+            field = value
+        }
+    private var served = 0
 
     private fun beforeChange() {
         weightTime += (simCore.currentTime - lastChange) * queue.size
@@ -76,6 +83,13 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
         beforeChange()
         queue.add(t)
         lastChange = simCore.currentTime
+    }
+
+    fun remove(t: T) {
+        val popped = (queue as LinkedList<T>).remove(t).let { t }
+        lastChange = simCore.currentTime
+        totalWaitTime += simCore.currentTime - popped.arrivedToSystem
+        served++
     }
 
     fun pop(): T {
@@ -91,6 +105,7 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
 
     fun averageSize() = weightTime / totalTime
 
+
     fun isEmpty() = queue.isEmpty()
 
     fun size() = queue.size
@@ -103,8 +118,10 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
         totalTime = 0.0
         weightTime = 0.0
         totalWaitTime = 0.0
-        served = 0.0
+        served = 0
     }
 
     fun toList() = queue.toList()
+
+
 }

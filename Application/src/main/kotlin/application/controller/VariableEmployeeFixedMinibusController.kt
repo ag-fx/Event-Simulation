@@ -2,7 +2,6 @@ package application.controller
 
 import aircarrental.AirCarConfig
 import aircarrental.AirCarRentalSimulation
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections.observableArrayList
 import javafx.scene.chart.XYChart
@@ -71,7 +70,7 @@ class VariableEmployeeFixedMinibusController : SimulationController() {
                 rep
                     .filter { it.size == sim.numberOfReplication - 1 }
                     .consumeEach {
-                        data.add(sim.conf.numberOfEmployees to it.map { it.customersTimeInSystem / 60 }.average())
+                        data.add(sim.conf.numberOfEmployees to it.map { it.averageTimeOfCustomerInSystem / 60 }.average())
                     }
             }
 

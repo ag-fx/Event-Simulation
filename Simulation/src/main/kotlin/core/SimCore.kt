@@ -36,8 +36,8 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
             beforeReplication()
             simulate(replicationNumber)
             coolDown()
-            afterReplication()
-            replicationStates += toState(replicationNumber, currentTime)
+            afterReplication(replicationNumber+1)
+            replicationStates += toState(replicationNumber+1, currentTime)
             if (!stop)
                 afterReplicationChannel.send(replicationStates)
         }
@@ -122,7 +122,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
             throw IllegalArgumentException("Event is occurring in the past")
     }
 
-    protected open fun afterReplication() {
+    protected open fun afterReplication(replicationNumber: Int) {
 
     }
 

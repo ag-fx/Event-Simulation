@@ -2,12 +2,9 @@ package application.controller
 
 import aircarrental.AirCarConfig
 import aircarrental.AirCarRentalSimulation
-import aircarrental.entities.Minibus
 import application.model.*
 import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.channels.consumeEach
 import kotlinx.coroutines.experimental.launch
@@ -16,28 +13,15 @@ import tornadofx.*
 import coroutines.JavaFx as onUi
 import tornadofx.getValue
 import tornadofx.setValue
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class MyController : Controller() {
 
     private val testSim = AirCarRentalSimulation(
-        conf = AirCarConfig(numberOfEmployees = 20, numberOfMinibuses = 5),
+        conf = AirCarConfig(numberOfEmployees = 8, numberOfMinibuses = 5),
         maxSimTime = 60.0 * 60.0 * 24.0 * 30.0,
         numberOfReplication = 100)
-
-    val textProperty = SimpleStringProperty("1")
-    private var text by textProperty
-
-    val simTextProperty = SimpleStringProperty("")
-    private var simText by simTextProperty
-
-    val simTimeProperty = SimpleStringProperty("")
-    private var simTime by simTimeProperty
-
-    val currentReplicationProperty = SimpleIntegerProperty(0)
-    var currentReplication by currentReplicationProperty
-
-    val replicationPercentageProperty = SimpleDoubleProperty(0.0)
-    var replicationPercentage by replicationPercentageProperty
 
     val speedProperty = SimpleDoubleProperty(500.0)
     var speed by speedProperty
@@ -67,11 +51,7 @@ class MyController : Controller() {
             testSim.currentReplicationChannel
                 .consumeEach {
                     currentRep = AirCarRentalStateModel(it)
-                    currentReplication = it.replicationNumber
-                    replicationPercentage = it.replicationNumber / (testSim.numberOfReplication * 1.0)
                     currentReplicationState.add(0, AirCarRentalStateModel(it))
-                    text = "${it.customersTimeInSystem.div(60)}"
-                    simTime = "${it.currentTime}"
                     terminal1ppl.setAll(it.terminal1Queue.map { CustomerModel(it) })
                     terminal2ppl.setAll(it.terminal2Queue.map { CustomerModel(it) })
                     aircarppl.setAll(it.carRentalQueue.map { CustomerModel(it) })
@@ -86,12 +66,14 @@ class MyController : Controller() {
         launch(onUi) {
             testSim.afterReplicationChannel
                 .consumeEach {
-                    currentReplication = it.last().replicationNumber
-                    replicationPercentage = it.last().replicationNumber / (testSim.numberOfReplication * 1.0)
-
+                    currentRep = AirCarRentalStateModel(it.last())
                     currentReplicationState.clear()
                     replications.add(0, AirCarRentalStateModel(it.last()))
-                    simText = "${it.map { it.customersTimeInSystem / 60 }.average()}"
+                    val avg = it.map { it.averageTimeOfCustomerInSystem/60 }.average()
+                    val nieco2 = it.map { (it.averageTimeOfCustomerInSystem - avg).pow(2) }.average()
+                    val left = avg - (1.645* sqrt(nieco2))/sqrt(it.size-1.0)
+                    val right = avg + (1.645* sqrt(nieco2))/sqrt(it.size-1.0)
+                    println((left to right).map { it/60 })
                 }
         }
 
@@ -127,3 +109,7 @@ class MyController : Controller() {
 
 
 }
+
+
+
+fun <T> Pair<T, T>.map(transform: (T) -> T): Pair<T,T> = transform(first) to transform(second)

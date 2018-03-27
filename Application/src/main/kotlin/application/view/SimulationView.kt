@@ -9,9 +9,7 @@ class SimulationView : View("Simulácia") {
     private val controller: MyController by inject()
 
     override val root = borderpane {
-        top = hbox {
-            this += ControlsView()
-        }
+        top = vbox { this += ControlsView() }
         center = tableview(controller.replications) {
             columnResizePolicy = SmartResize.POLICY
 
@@ -23,9 +21,7 @@ class SimulationView : View("Simulácia") {
             column("daco", AirCarRentalStateModel::avgQueueSizeTerminalOne)
             column("daco", AirCarRentalStateModel::avgQueueWaitTimeTerminalOne)
 
-
         }
-
     }
 }
 

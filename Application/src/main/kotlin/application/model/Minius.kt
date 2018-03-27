@@ -12,6 +12,6 @@ class MinibusModel(curretnTime:Double, minibus: Minibus) : ItemViewModel<Minibus
     val destination = bind(Minibus::destination)
     val source = bind(Minibus::source)
     val leftAt = bind(Minibus::leftAt)
-    val isInSource = bind(Minibus::isInSource)
-    val distanceFromSource = SimpleDoubleProperty(minibus.distanceFromSource(curretnTime))
+    val isInSource = bind(Minibus::isInDestination)
+    val distanceFromDestination = SimpleDoubleProperty(minibus.distanceFromDestinatioN(curretnTime))
 }

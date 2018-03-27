@@ -5,12 +5,14 @@ import tornadofx.*
 
 class AirCarRentalStateModel(state: AirCarRentalState) : tornadofx.ItemViewModel<AirCarRentalState>(state) {
     val replicationNumber = bind(AirCarRentalState::replicationNumber)
-//    val minibuses = bind(AirCarRentalState::minibuses)
+    //    val minibuses = bind(AirCarRentalState::minibuses)
     val avgQueueSizeTerminalOne = bind(AirCarRentalState::avgQueueSizeTerminalOne)
     val avgQueueSizeTerminalTwo = bind(AirCarRentalState::avgQueueSizeTerminalTwo)
+    val avgQueueSizeCarRental = bind(AirCarRentalState::avgQueueSizeCarRental)
     val avgQueueWaitTimeTerminalOne = bind(AirCarRentalState::avgQueueWaitTimeTerminalOne)
     val avgQueueWaitTimeTerminalTwo = bind(AirCarRentalState::avgQueueWaitTimeTerminalTwo)
-    val customersTimeInSystem = bind(AirCarRentalState::customersTimeInSystem)
+    val avgQueueWaitTimeCarRental = bind(AirCarRentalState::avgQueueWaitTimeCarRental)
+    val customersTimeInSystem = bind(AirCarRentalState::averageTimeOfCustomerInSystem)
     val totalTerminal1 = bind(AirCarRentalState::totalTerminal1)
     val totalTerminal2 = bind(AirCarRentalState::totalTerminal2)
     val running = bind(AirCarRentalState::running)

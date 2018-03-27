@@ -1,8 +1,6 @@
 package application.view
 
-import aircarrental.AirCarRentalState
 import application.controller.MyController
-import application.model.AirCarRentalStateModel
 import application.model.CustomerModel
 import application.model.EmployeeModel
 import tornadofx.*
@@ -11,13 +9,12 @@ class Terminal1View : View("Terminal 1") {
     private val controller: MyController by inject()
 
     override val root = borderpane {
-        top = vbox {
 
-        }
-        center = tableview(controller.terminal1ppl) {
-            column("Id", CustomerModel::id)
-            column("Terminal", CustomerModel::terminal)
-            column("Prichod", CustomerModel::arrivedToSystem)
+        left = tableview(controller.terminal1ppl) {
+            smartResize()
+            column("Id", CustomerModel::id).apply{ isSortable = false}
+            column("Terminal", CustomerModel::terminal).apply{ isSortable = false}
+            column("Prichod", CustomerModel::arrivedToSystem).apply{ isSortable = false}
         }
     }
 }
@@ -27,10 +24,11 @@ class Terminal2View : View("Terminal 2") {
 
     override val root = borderpane {
 
-        center = tableview(controller.terminal2ppl) {
-            column("Id", CustomerModel::id)
-            column("Terminal", CustomerModel::terminal)
-            column("Prichod", CustomerModel::arrivedToSystem)
+        left = tableview(controller.terminal2ppl) {
+            smartResize()
+            column("Id", CustomerModel::id).apply{ isSortable = false}
+            column("Terminal", CustomerModel::terminal).apply{ isSortable = false}
+            column("Prichod", CustomerModel::arrivedToSystem).apply{ isSortable = false}
         }
     }
 }
@@ -38,16 +36,20 @@ class Terminal2View : View("Terminal 2") {
 class AirCarRentalView : View("AirCar Rental") {
     private val controller: MyController by inject()
 
-    override val root =  borderpane {
-          center =   tableview(controller.aircarppl) {
-                column("Id", CustomerModel::id)
-                column("Terminal", CustomerModel::terminal)
-                column("Prichod", CustomerModel::arrivedToSystem)
-            }
-           right =  tableview(controller.employees) {
-                column("Id", EmployeeModel::id)
-                column("Obsluhuje", EmployeeModel::isBusy)
-                column("Zakaznik", EmployeeModel::serving)
-            }
+    override val root = borderpane {
+        center = tableview(controller.aircarppl) {
+            smartResize()
+
+            column("Id", CustomerModel::id).apply{ isSortable = false}
+            column("Terminal", CustomerModel::terminal).apply{ isSortable = false}
+            column("Prichod", CustomerModel::arrivedToSystem).apply{ isSortable = false}
+        }
+        right = tableview(controller.employees) {
+            smartResize()
+
+            column("Id", EmployeeModel::id).apply{ isSortable = false}
+            column("Obsluhuje", EmployeeModel::isBusy).apply{ isSortable = false}
+            column("Zakaznik", EmployeeModel::serving).apply{ isSortable = false}
+        }
     }
 }
