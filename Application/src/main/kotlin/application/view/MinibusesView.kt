@@ -10,8 +10,8 @@ class MinibusesView : View("Minibusy") {
     private val controller: MyController by inject()
     private val selected = SimpleListProperty<CustomerModel>()
     override val root = borderpane {
-        top = label("minibus")
         center = tableview(controller.minubuses) {
+            maxWidth = 500.0
             column("ID", MinibusModel::id)
             column("Odkial", MinibusModel::source)
             column("Kam", MinibusModel::destination)

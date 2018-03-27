@@ -8,24 +8,20 @@ class SimulationView : View("Simulácia") {
 
     private val controller: MyController by inject()
 
-    override val root = vbox {
-        spacer()
-        this += ControlsView()
-        spacer()
-        tableview(controller.replications) {
+    override val root = borderpane {
+        top = hbox {
+            this += ControlsView()
+        }
+        center = tableview(controller.replications) {
             columnResizePolicy = SmartResize.POLICY
 
-            // column("Simulacny cas", AirCarRentalStateModel::currentTime){
-            //     isSortable = false
-            //     converter(SecondsToMinutesConverter())
-            // }
             column("Priemerny straveny cas", AirCarRentalStateModel::customersTimeInSystem) {
                 isSortable = false
                 converter(SecondsToMinutesConverter())
             }
 
-            column("daco",AirCarRentalStateModel::avgQueueSizeTerminalOne)
-            column("daco",AirCarRentalStateModel::avgQueueWaitTimeTerminalOne)
+            column("daco", AirCarRentalStateModel::avgQueueSizeTerminalOne)
+            column("daco", AirCarRentalStateModel::avgQueueWaitTimeTerminalOne)
 
 
         }

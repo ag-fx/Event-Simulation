@@ -26,9 +26,7 @@ class Terminal2View : View("Terminal 2") {
     private val controller: MyController by inject()
 
     override val root = borderpane {
-        top = vbox {
 
-        }
         center = tableview(controller.terminal2ppl) {
             column("Id", CustomerModel::id)
             column("Terminal", CustomerModel::terminal)
@@ -40,17 +38,16 @@ class Terminal2View : View("Terminal 2") {
 class AirCarRentalView : View("AirCar Rental") {
     private val controller: MyController by inject()
 
-    override val root =  hbox {
-            tableview(controller.aircarppl) {
+    override val root =  borderpane {
+          center =   tableview(controller.aircarppl) {
                 column("Id", CustomerModel::id)
                 column("Terminal", CustomerModel::terminal)
                 column("Prichod", CustomerModel::arrivedToSystem)
             }
-            tableview(controller.employees) {
+           right =  tableview(controller.employees) {
                 column("Id", EmployeeModel::id)
                 column("Obsluhuje", EmployeeModel::isBusy)
                 column("Zakaznik", EmployeeModel::serving)
             }
-
     }
 }

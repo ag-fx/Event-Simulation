@@ -32,12 +32,12 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     suspend fun start() {
         beforeSimulation()
-        repeat(replications) {
+        repeat(replications) { replicationNumber ->
             beforeReplication()
-            simulate()
+            simulate(replicationNumber)
             coolDown()
             afterReplication()
-            replicationStates += toState(it, currentTime)
+            replicationStates += toState(replicationNumber, currentTime)
             if (!stop)
                 afterReplicationChannel.send(replicationStates)
         }
@@ -45,7 +45,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
         isRunning = false
     }
 
-    private suspend fun simulate() {
+    private suspend fun simulate(replicationNumber: Int) {
         if (isWatched())
             planTick()
 
@@ -59,7 +59,7 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
                 currentEvent.execute()
 
                 if (isWatched()) {
-                    val state = toState(runs++, currentTime)
+                    val state = toState(replicationNumber, currentTime)
                     currentReplicationChannel.send(state)
                 }
 
@@ -102,12 +102,12 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
      * @return True if event should be executed in cooldown
      */
     protected abstract fun coolDownEventFilter(event: Event): Boolean
-
-    private val tick = Tick<S>(currentTime + 1)
+    var oneTick = 1.0
+    private val tick = Tick<S>(currentTime + oneTick)
 
     fun planTick() {
         tick.core = this
-        tick.occurrenceTime = currentTime + 1
+        tick.occurrenceTime = currentTime + oneTick
         timeline.add(tick)
     }
 

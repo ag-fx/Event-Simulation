@@ -10,7 +10,7 @@ import java.util.*
 
 class AirCarRentalSimulation(
     val conf: AirCarConfig,
-    maxSimTime: Double = 60*60*24*30.0,
+     maxSimTime: Double = 60*60*24*30.0,
     val numberOfReplication: Int = 100
 ) : SimCore<AirCarRentalState>(maxSimTime, numberOfReplication) {
 

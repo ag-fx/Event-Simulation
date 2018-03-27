@@ -15,42 +15,48 @@ import tornadofx.*
 import coroutines.JavaFx as onUi
 
 
-class VariableMinibusFixedEmployeeController : Controller() {
+class VariableMinibusFixedEmployeeController : SimulationController() {
 
-    val employee = 6
-
-    val graphNameProperty = SimpleStringProperty("Fixný počet pracovníkov : $employee")
-    var graphName by graphNameProperty
 
     val data = observableArrayList<XYChart.Data<Number, Number>>()!!
-    val line = (0..30).map { it to 20 }.map { XYChart.Data(it.first as Number, it.second as Number) }.observable()
+    val line = (0..30)
+        .map { it to 20 }
+        .map { XYChart.Data(it.first as Number, it.second as Number) }
+        .observable()
 
-    private val thread: ThreadPoolDispatcher = newSingleThreadContext("VariableMinibusFixedEmployeeController")
-    private val simulations: List<AirCarRentalSimulation> = (3..30)
-        .map { AirCarConfig(numberOfMinibuses = it, numberOfEmployees = employee) }
-        .map { AirCarRentalSimulation(conf = it, maxSimTime = 60 * 60 * 24.0 * 30, numberOfReplication = 30) }
+    private val thread = newSingleThreadContext("VariableEmployeeFixedMinibusController")
+
+    private fun simulations() = (minNumberOfMinibuses..maxNumberOfMinibuses)
+        .map { AirCarConfig(numberOfMinibuses = it, numberOfEmployees = maxNumberOfEmployees) }
+        .map { AirCarRentalSimulation(conf = it, maxSimTime = 60.0 * 60 * 24 * numberOfDays, numberOfReplication = numberOfReplication) }
         .onEach {
             it.stopWatching()
             it.log = false
         }
 
-    fun start() = simulations.asSequence().forEach { sim ->
-        launch(thread) { sim.start() }
-        launch(onUi) {
-            sim.afterReplicationChannel
-                .filter { it.size == sim.numberOfReplication - 1 }
-                .consumeEach {
-                    data.add(sim.conf.numberOfMinibuses to it.map { it.customersTimeInSystem / 60 }.average())
-                    println(sim.conf.numberOfMinibuses to it.map { it.customersTimeInSystem / 60 }.average())
-                }
+    private lateinit var simulations: List<AirCarRentalSimulation>
+
+    override fun start() {
+        simulations = simulations()
+        simulations.asSequence().forEach { sim ->
+            launch(thread) { sim.start() }
+            val rep = sim.afterReplicationChannel
+            launch(onUi) {
+                rep
+                    .filter { it.size == sim.numberOfReplication - 1 }
+                    .consumeEach {
+                        data.add(sim.conf.numberOfMinibuses to it.map { it.customersTimeInSystem / 60 }.average())
+                    }
+            }
+
         }
     }
 
-    fun stop() = simulations.forEach { it.stop() }
+    override fun stop() = simulations.forEach { it.stop() }
 
-    fun pause() = simulations.forEach { it.pause() }
+    override fun pause() = simulations.forEach { it.pause() }
 
-    fun resume() = simulations.forEach { it.resume() }
+    override fun resume() = simulations.forEach { it.resume() }
 
 }
 

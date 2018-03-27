@@ -14,6 +14,8 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.newSingleThreadContext
 import tornadofx.*
 import coroutines.JavaFx as onUi
+import tornadofx.getValue
+import tornadofx.setValue
 
 class MyController : Controller() {
 
@@ -39,6 +41,10 @@ class MyController : Controller() {
 
     val speedProperty = SimpleDoubleProperty(500.0)
     var speed by speedProperty
+
+    val tickProperty = SimpleDoubleProperty(1.0)
+    var tick by tickProperty
+
 
     val currentRepProperty = SimpleObjectProperty<AirCarRentalStateModel>(initModel)
     var currentRep by currentRepProperty
@@ -111,6 +117,12 @@ class MyController : Controller() {
 
     fun updateSpeed() {
         testSim.sleepTime = speed.toLong()
+        tick = 5.0
+        updateTick()
+    }
+
+    fun updateTick() {
+        testSim.oneTick = tick
     }
 
 

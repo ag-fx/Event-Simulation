@@ -2,6 +2,10 @@ package application.view
 
 import application.controller.MyController
 import application.model.AirCarRentalStateModel
+import application.view.converter.ReplicationConverter
+import application.view.converter.SimTimeConverter
+import application.view.converter.SimTimeToRealTimeConverter
+import javafx.geometry.Insets
 import javafx.scene.control.TabPane
 import tornadofx.*
 
@@ -32,29 +36,61 @@ class ReplicationView : View("Replikácia") {
     override val root = borderpane {
         top = vbox {
             spacer()
-            this+=ControlsView()
-            slider(min = 0, max = 1000) {
-                valueProperty().bindBidirectional(controller.speedProperty)
-                setOnMouseClicked { controller.updateSpeed() }
+            this += ControlsView()
+            spacer()
+            label("Dlžka uspania po jednej sekunde")
+            hbox {
+                fitToWidth(this)
+                hbox {
+                    label("max speed")
+                    slider(min = 0, max = 500) {
+                        valueProperty().bindBidirectional(controller.speedProperty)
+                        setOnMouseReleased { controller.updateSpeed() }
+                    }
+                    label("min speed")
+                }
+                spacer()
+                hbox {
+                    label("1 sekunda")
+                    slider(min = 1, max = 300) {
+                        valueProperty().bindBidirectional(controller.tickProperty)
+                        setOnMouseReleased { controller.updateTick() }
+                    }
+                    label("300 sekund")
+                }
             }
         }
 
-        center = tabpane{
+        center = tabpane {
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
             tab(Terminal1View::class)
             tab(Terminal2View::class)
             tab(AirCarRentalView::class)
             tab(MinibusesView::class)
         }
-        right = tableview(controller.currentReplicationState) {
-            columnResizePolicy = SmartResize.POLICY
+        right = vbox {
+            padding = Insets(10.0)
+            minWidth = 200.0
+            hbox {
+                label("Simulacny cas")
+                spacer()
+                label(controller.currentRepProperty, converter = SimTimeConverter())
+            }
+            spacer()
+            hbox {
+                label("Simulacny cas")
+                spacer()
+                label(controller.currentRepProperty, converter = SimTimeToRealTimeConverter())
 
-            column("Simulacny cas", AirCarRentalStateModel::currentTime) {
-                isSortable = false
             }
-            column("Priemerny straveny cas", AirCarRentalStateModel::customersTimeInSystem) {
-                isSortable = false
+            spacer()
+            hbox {
+                label("Replikacia")
+                spacer()
+                label(controller.currentRepProperty, converter = ReplicationConverter())
+
             }
+
         }
 
     }

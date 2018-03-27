@@ -6,12 +6,18 @@ import tornadofx.*
 class MainView : View("Hello TornadoFX") {
 
 
-    override val root = tabpane {
-        tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
-        tab(FixedMinibusView::class)
-        tab(FixedEmployeeView::class)
-        tab(ReplicationView::class)
-        tab(SimulationView::class)
+    override val root = hbox {
+        minWidth = 600.0
+
+        tabpane {
+            fitToWidth(this@hbox)
+            fitToHeight(this@hbox)
+            tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
+            tab(FixedMinibusView::class)
+            tab(FixedEmployeeView::class)
+            tab(ReplicationView::class)
+            tab(SimulationView::class)
+        }
     }
 
 }
