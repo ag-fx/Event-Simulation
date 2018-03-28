@@ -52,6 +52,11 @@ class StatisticPriorityQueue<T : Statistical, S : State>(private val simCore: Si
         clearStat()
     }
 
+    fun fixTimeAtEndOfSimulation(lastTimeInSimulation: Double) {
+//        weightTime += (lastChange - lastTimeInSimulation) * queue.size
+//        totalTime  += (simCore.currentTime - lastTimeInSimulation)
+    }
+
     fun clearStat() {
         lastChange = 0.0
         totalTime = 0.0
@@ -82,7 +87,6 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
     private fun beforeChange() {
         weightTime += (simCore.currentTime - lastChange) * queue.size
         totalTime += (simCore.currentTime - lastChange)
-
     }
 
     fun push(t: T) {
@@ -123,7 +127,7 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
         clearStat()
     }
 
-    fun clearStat(){
+    fun clearStat() {
         lastChange = 0.0
         totalTime = 0.0
         weightTime = 0.0
@@ -133,36 +137,41 @@ class StatisticQueue<T : Statistical, S : State>(private val simCore: SimCore<S>
 
     fun toList() = queue.toList()
 
+    fun fixTimeAtEndOfSimulation(lastTimeInSimulation: Double) {
+        lastTimeInSimulation.let { it }
+//        weightTime += (lastChange - lastTimeInSimulation) * queue.size
+//        totalTime  += (simCore.currentTime - lastTimeInSimulation)
+    }
 }
 
 abstract class Stat {
 
     private var sumXpow2 = 0.0
     private var sumX = 0.0
-    private var served = 0
+    private var served = 0.0
+    val alfa = 1.645
 
-    private val alfa = 1.645
-
-
+    private fun alfaS() = alfa * sqrt((sumXpow2 / served) - ((sumX.pow(2)) / served))
 
     fun meanConfidence90(): Double {
-        val standDeviation = Math.sqrt(1 / (served*1.0)  * sumXpow2 - Math.pow(1 / (served*1.0) * sumX, 2.0))
-        return 1.645 * (standDeviation / Math.sqrt(served*1.0))
+        val standDeviation = Math.sqrt(1 / served as Double * sumXpow2 - Math.pow(1 / served as Double * sumX, 2.0))
+        return 1.645 * (standDeviation / Math.sqrt(served))
     }
 
-    fun average() = sumX / served
+    fun average()       = sumX / served
+    fun averageSquare() = sumXpow2 / served
 
-    fun interval() = average() - meanConfidence90() to average() + meanConfidence90()
+    fun interval(avg: Double, n: Int) = avg - (alfaS() / sqrt(n - 1.0)) to avg + (alfaS() / sqrt(n - 1.0))
 
     fun add(t: Double) {
         sumX += t
         sumXpow2 += t.pow(2)
-        served++
+        served += 1
     }
 
-    fun clear() { //TODO zavolat v after replication
+    fun clear() {
         sumX = 0.0
         sumXpow2 = 0.0
-        served = 0
+        served = 0.0
     }
 }

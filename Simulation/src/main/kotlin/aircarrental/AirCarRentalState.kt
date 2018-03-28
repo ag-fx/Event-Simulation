@@ -27,6 +27,7 @@ data class AirCarRentalState(
     override val stopped: Boolean,
     override val currentTime: Double,
     override val run: Int,
+
     val numberOfServedCustomers: Double,
     val totalCustomersTime: Double,
     val config: AirCarConfig,
@@ -34,8 +35,11 @@ data class AirCarRentalState(
     val terminal2Queue: List<Customer>,
     val carRentalQueue: List<Customer>,
     val employees: List<Employee>,
-    val statistics: Statistics?= null
-) : State
+    val statistics: Statistics? = null
+    ) : State
+
+
+
 
 data class AirCarConfig(
         val numberOfMinibuses: Int,

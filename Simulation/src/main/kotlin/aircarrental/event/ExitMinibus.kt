@@ -9,7 +9,10 @@ class ExitMinibus(
 
     override fun execute() = with(core) {
   //TODO nemal by som hadzat zakaznika do rady ak sa ide rovno obsluzit, bude to kazit vysledky
-        val exitingCustomer = minibus.seats.pop().apply { startWaitingInCarRental= currentTime }
+        val exitingCustomer = minibus.seats.pop().apply {
+            startWaitingInCarRental= currentTime
+            endOfLoading = currentTime
+        }
         carRental.queue.push(exitingCustomer)
 
         log("$exitingCustomer exiting bus ${minibus.id}  at $occurrenceTime")

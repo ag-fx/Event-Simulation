@@ -6,6 +6,8 @@ data class Customer(
     val id: Int,
     val terminal: Buildings,
     var startWaitingInCarRental: Double = 0.0,
+    var startOfLoading: Double = 0.0,
+    var endOfLoading: Double = 0.0,
     var getOnBusTime: Double = 0.0,
     var getFromBusTime: Double = 0.0,
     override var arrivedToSystem: Double

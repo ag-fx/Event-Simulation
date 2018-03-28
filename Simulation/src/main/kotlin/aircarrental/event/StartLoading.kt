@@ -16,7 +16,7 @@ class StartLoading(
             plan(EnterToMinibus(
                 minibus = minibus,
                 terminal = terminal,
-                customer = terminal.queue.pop(),
+                customer = terminal.queue.pop().apply { startOfLoading = currentTime },
                 time = currentTime + rndTimeToEnterBus.next()
             ))
          else

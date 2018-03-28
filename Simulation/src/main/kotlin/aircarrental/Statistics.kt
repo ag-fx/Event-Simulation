@@ -19,14 +19,13 @@ import java.util.*
 //}
 
 data class Statistics(
-    var interval: Pair<Double, Double> = 0.0 to 0.0,
-    var interval2: Pair<Double, Double> = 0.0 to 0.0,
-    val avgTimeInSystem: LinkedList<Double>,
-    val avgWaitTimeTerminal1: LinkedList<Double>,
-    val avgWaitTimeTerminal2: LinkedList<Double>,
-    val avgWaitTimeAirCarRental: LinkedList<Double>,
-    val avgQueueSizeTerminal1: LinkedList<Double>,
-    val avgQueueSizeTerminal2: LinkedList<Double>,
-    val avgQueueSizeAirCarRental: LinkedList<Double>
+    val interval: LinkedList<Pair<Double, Double>> = LinkedList(),
+    val avgTimeInSystem: LinkedList<Double> = LinkedList(),
+    val avgWaitTimeTerminal1: LinkedList<Double> = LinkedList(),
+    val avgWaitTimeTerminal2: LinkedList<Double> = LinkedList(),
+    val avgWaitTimeAirCarRental: LinkedList<Double> = LinkedList(),
+    val avgQueueSizeTerminal1: LinkedList<Double> = LinkedList(),
+    val avgQueueSizeTerminal2: LinkedList<Double> = LinkedList(),
+    val avgQueueSizeAirCarRental: LinkedList<Double> = LinkedList()
 
 )

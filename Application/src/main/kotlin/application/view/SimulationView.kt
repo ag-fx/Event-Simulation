@@ -7,6 +7,7 @@ import application.view.converter.decimalFormat
 import javafx.geometry.Insets
 import org.nield.kotlinstatistics.geometricMean
 import tornadofx.*
+import java.text.DecimalFormat
 
 class SimulationView : View("Simulácia") {
 
@@ -29,7 +30,13 @@ class SimulationView : View("Simulácia") {
             label("90% Interval spolahlivosti")
 
             label(controller.currentRepProperty, converter = XConverter {
-                it?.statistics?.interval?.map { it / 60.0 }?.toString() ?: "0"
+                val f = DecimalFormat("0.000")
+                val interval = it?.statistics?.interval
+                if (interval != null) {
+                    val l = interval.last().first.let { it / 60 }.let { f.format(it) }
+                    val r = interval.last().second.let { it / 60 }.let { f.format(it) }
+                    "< $l ; $r >"
+                } else ""
             })
             hbox {
                 label("Replikacia")
@@ -97,7 +104,7 @@ class SimulationView : View("Simulácia") {
                 "Replikacie" to controller.numberOfReplicationProperty,
                 "Dni" to controller.numberOfDaysProperty
             ).forEach {
-                val l = if(it.first.contentEquals("Replikacie")) listOf(1,10,50,100,200,300,500,1000,5000,10000).toList() else (1..30).toList()
+                val l = if (it.first.contentEquals("Replikacie")) listOf(1, 10, 50, 100, 200, 300, 500, 1000, 5000, 10000).toList() else (1..30).toList()
                 hbox {
                     label(it.first)
                     spacer()

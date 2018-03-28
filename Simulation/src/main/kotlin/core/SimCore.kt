@@ -33,8 +33,8 @@ abstract class SimCore<S : State>(val maxSimTime: Double, val replications: Int)
 
     suspend fun start() {
         stop = false
-       // currentReplicationChannel
-       // afterReplicationChannel.o
+        // currentReplicationChannel
+        // afterReplicationChannel.o
         beforeSimulation()
         repeat(replications) { replicationNumber ->
             beforeReplication()

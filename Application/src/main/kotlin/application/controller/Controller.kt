@@ -6,22 +6,23 @@ import application.model.*
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.channels.consumeEach
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.newSingleThreadContext
 import tornadofx.*
 import coroutines.JavaFx as onUi
-import tornadofx.getValue
-import tornadofx.setValue
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 class MyController : SimulationController() {
 
+    init {
+        maxNumberOfMinibuses = 5
+        maxNumberOfEmployees = 8
+        numberOfReplication = 100
+        numberOfDays = 30
+    }
+
     private lateinit var testSim: AirCarRentalSimulation
     val threadJobs = mutableListOf<Job>()
-
 
     val speedProperty = SimpleDoubleProperty(500.0)
     var speed by speedProperty
@@ -69,7 +70,6 @@ class MyController : SimulationController() {
                     employees.setAll(it.employees.map { EmployeeModel(it) })
                     val sim = it
                     minubuses.setAll(it.minibuses.map { MinibusModel(sim.currentTime, it) })
-
                 }
 
         }
@@ -82,7 +82,7 @@ class MyController : SimulationController() {
         }
 
         val j3 = launch(thread) { testSim.start() }
-        threadJobs.addAll(listOf(j1,j2,j3))
+        threadJobs.addAll(listOf(j1, j2, j3))
 
     }
 
@@ -92,8 +92,8 @@ class MyController : SimulationController() {
 
     override fun stop() {
         testSim.stop()
-      //  threadJobs.forEach { it.cancel() }
-      //  threadJobs.clear()
+        //  threadJobs.forEach { it.cancel() }
+        //  threadJobs.clear()
         currentRep = initModel
     }
 

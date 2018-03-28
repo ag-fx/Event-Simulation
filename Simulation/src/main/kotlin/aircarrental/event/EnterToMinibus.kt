@@ -15,6 +15,7 @@ class EnterToMinibus(
     override fun execute() = with(core) {
 
         minibus.enter(customer)
+        customer.endOfLoading = currentTime
         log("Customer ${customer.id} entering at $currentTime to minibus ${minibus.id}")
 
         if (minibus.isNotFull() && terminal.queue.isNotEmpty())
