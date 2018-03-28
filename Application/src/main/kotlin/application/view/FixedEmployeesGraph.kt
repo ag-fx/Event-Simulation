@@ -56,12 +56,14 @@ class FixedMinibusView(val name: String = "Závislosť na počte pracovníkov") 
         }
         center = linechart<Number, Number>("", x, y) {
             series(" ", controller.data)
-            series("20 minut", controller.line)
+            //series("20 minut", controller.line)
 
-            createSymbols = false
+            createSymbols = true
             with(xAxis as NumberAxis) {
                 isForceZeroInRange = false
                 isAutoRanging= true
+                lowerBoundProperty().bindBidirectional(controller.lowerBoundProperty)
+                upperBoundProperty().bindBidirectional(controller.upperBoundProperty)
             }
             with(yAxis as NumberAxis) {
                 isForceZeroInRange = false

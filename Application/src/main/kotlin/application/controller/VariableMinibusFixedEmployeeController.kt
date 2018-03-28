@@ -34,6 +34,8 @@ class VariableMinibusFixedEmployeeController : SimulationController() {
     private lateinit var simulations: List<AirCarRentalSimulation>
 
     override fun start() {
+        lowerBound = minNumberOfMinibuses
+        upperBound = maxNumberOfMinibuses
         simulations = simulations()
         simulations.asSequence().forEach { sim ->
             launch(thread) { sim.start() }

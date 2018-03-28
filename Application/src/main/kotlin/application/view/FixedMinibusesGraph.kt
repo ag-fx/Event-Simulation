@@ -10,6 +10,7 @@ class FixedEmployeeView : View("Závislosť na počte mikrobusov") {
     private val x = NumberAxis()
     private val y = NumberAxis()
 
+
     val graphName = "Závislosť priemerného času stráveného zákazníkom\nna zapožičanie vozidla na počte mikrobusov."
     override val root = borderpane {
         top = vbox {
@@ -60,11 +61,13 @@ class FixedEmployeeView : View("Závislosť na počte mikrobusov") {
         center =
             linechart<Number, Number>("", x, y) {
                 series(" ", controller.data)
-                series("20 minut", controller.line)
-                createSymbols = false
+//                series("20 minut", controller.line)
+                createSymbols = true
                 with(xAxis as NumberAxis) {
                     isForceZeroInRange = false
                     isAutoRanging = true
+                    lowerBoundProperty().bindBidirectional(controller.lowerBoundProperty)
+                    upperBoundProperty().bindBidirectional(controller.upperBoundProperty)
                 }
                 with(yAxis as NumberAxis) {
                     isForceZeroInRange = false

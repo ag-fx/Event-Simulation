@@ -2,6 +2,7 @@ package application.controller
 
 import aircarrental.AirCarConfig
 import aircarrental.AirCarRentalSimulation
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections.observableArrayList
 import javafx.scene.chart.XYChart
@@ -16,7 +17,7 @@ import tornadofx.setValue
 
 abstract class SimulationController : Controller() {
 
-    val minNumberOfMinibusesProperty = SimpleObjectProperty(3)
+    val minNumberOfMinibusesProperty = SimpleObjectProperty(5)
     var minNumberOfMinibuses by minNumberOfMinibusesProperty
 
     val maxNumberOfMinibusesProperty = SimpleObjectProperty(6)
@@ -25,14 +26,20 @@ abstract class SimulationController : Controller() {
     val minNumberOfEmployeesProperty = SimpleObjectProperty(10)
     var minNumberOfEmployees by minNumberOfEmployeesProperty
 
-    val maxNumberOfEmployeesProperty = SimpleObjectProperty(19)
+    val maxNumberOfEmployeesProperty = SimpleObjectProperty(25)
     var maxNumberOfEmployees by maxNumberOfEmployeesProperty
 
-    val numberOfDaysProperty = SimpleObjectProperty(7)
+    val numberOfDaysProperty = SimpleObjectProperty(30)
     var numberOfDays by numberOfDaysProperty
 
-    val numberOfReplicationProperty = SimpleObjectProperty(10)
+    val numberOfReplicationProperty = SimpleObjectProperty(100)
     var numberOfReplication by numberOfReplicationProperty
+
+    val lowerBoundProperty = SimpleIntegerProperty(5)
+    var lowerBound by lowerBoundProperty
+
+    val upperBoundProperty = SimpleIntegerProperty(10)
+    var upperBound by upperBoundProperty
 
     abstract fun start()
     abstract fun stop()
@@ -62,6 +69,8 @@ class VariableEmployeeFixedMinibusController : SimulationController() {
     private lateinit var simulations: List<AirCarRentalSimulation>
 
     override fun start() {
+        lowerBound = minNumberOfEmployees
+        upperBound = maxNumberOfEmployees
         simulations = simulations()
         simulations.asSequence().forEach { sim ->
             launch(thread) { sim.start() }
