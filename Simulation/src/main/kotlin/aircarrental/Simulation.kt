@@ -72,8 +72,8 @@ class AirCarRentalSimulation(
                 time = 0.0
             ))
         }
-        val terminalOneArrival = TerminalOneCustomerArrival(currentTime)// + rndArrivalTerminalOne.next())
-        val terminalTwoArrival = TerminalTwoCustomerArrival(currentTime)// + rndArrivalTerminalTwo.next())
+        val terminalOneArrival = TerminalOneCustomerArrival(currentTime)
+        val terminalTwoArrival = TerminalTwoCustomerArrival(currentTime)
         plan(terminalOneArrival)
         plan(terminalTwoArrival)
     }
@@ -95,22 +95,6 @@ class AirCarRentalSimulation(
         carRental.queue.clearStat()
     }
 
-    /**
-     * TODO dokumentacie
-     * nejaky navrh udalosti
-     * programatorska dokumentacia, navrh analyza, specificke technologie
-     * dokumentacia v style biznis...nerobit screeny z aplikacie ..nejaky excel alebo tak
-     * grafy mozu byt z aplikacie
-     */
-    /*
-    no tie xi vieš čo su nie ? vysledok po každej replikacii...
-    a robim to tak, že vlastne mam dve premenne jednu pre tu prvu polovicu toho vzorca druhu pre druhu..
-    čiže v jednej napočitavaš druhu mocninu a davš * 1 / n po každej replikacii
-     a v druhej napočitavaš a daš to podla vzorca potom proste vyrataš     a dostaneš tu odchylku
-     ... no a v tom vzorci na samostatny ten interval to už len dosadiš.. x s čiarou maš priemer so
-    všetkých replikácii ten  si tiež vieš postupne napočitvať a potom len vydeliť...
-    a to t alfa je konštanta 1,645 davam ale neviem či to nie je pre 95% interval a neviem či mi nemame robiť nahodou 90%
-     */
     var totalwaittime = 0.0
     var sumaxinadruhu = 0.0
     var sumaxi = 0.0
@@ -127,27 +111,15 @@ class AirCarRentalSimulation(
 
 
         val xavg = totalwaittime / replicationNumber
-        val s = 1.645*sqrt(
-            sumaxinadruhu/replicationNumber - (sumaxi/replicationNumber).pow(2)
+        val s = 1.645 * sqrt(
+            sumaxinadruhu / replicationNumber - (sumaxi / replicationNumber).pow(2)
         )
 
         val l = (xavg - s / sqrt(replicationNumber - 1.0))
         val r = (xavg + s / sqrt(replicationNumber - 1.0))
 
-//        val avg = statistics.avgTimeInSystem.average()
-//        val aaa = statistics.avgTimeInSystem.map { (it - avg).pow(2) }.average().let { sqrt(it) * 1.645 }
-//
-//        val ll = (avg - aaa / sqrt(replicationNumber - 1.0)) / 60
-//        val rr = (avg + aaa / sqrt(replicationNumber - 1.0)) / 60
-
-//        println("X $l \t $r")
-//        println("X ${l - r}")
-//        println("O $ll \t $rr")
-//        println("O ${ll - rr}")
-        //24.248369-24.256789
         with(statistics) {
-            //    avgTimeInSystem.add(avgTimeInSystemTEST.average())
-            interval.add(l to r)// avgTimeInSystemTEST.interval(avgTimeInSystem.average(), replicationNumber)            )
+            interval.add(l to r)
             avgWaitTimeTerminal1.add(terminalOne.queue.averageWaitTime())
             avgWaitTimeTerminal2.add(terminalTwo.queue.averageWaitTime())
 
@@ -182,6 +154,13 @@ class AirCarRentalSimulation(
 
         totalCustomersTime = 0.0
         numberOfServedCustomers = 0.0
+    }
+
+    override fun afterSimulation() {
+        super.afterSimulation()
+        totalwaittime = 0.0
+        sumaxinadruhu = 0.0
+        sumaxi = 0.0
     }
 
     //region generators
