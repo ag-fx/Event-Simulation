@@ -88,7 +88,7 @@ class AirCarRentalSimulation(
     override fun beforeSimulation() {
     }
 
-    override fun afterWarmUp() {
+    override fun  afterWarmUp() {
         avgTimeInSystemTEST.clear()
         terminalOne.queue.clearStat()
         terminalTwo.queue.clearStat()
